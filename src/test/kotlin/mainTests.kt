@@ -9,7 +9,7 @@ fun main() {
 
 
     val uc1 = JObjectAttributes(Pair("uc1", obj1))
-    println(uc1.toString())
+    //println(uc1.toString())
 
     val ucname2 = JObjectAttributes(Pair("uc2", JString("PO")))
     val etcs2 = JObjectAttributes(Pair("etcs2", JNumber(3.0)))

@@ -1,8 +1,3 @@
-import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
-import kotlin.reflect.KType
-import kotlin.reflect.full.declaredMemberProperties
-
 data class JObject (
 
     val value: List<JObjectAttributes>

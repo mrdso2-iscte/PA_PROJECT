@@ -1,5 +1,3 @@
-
-
 class JString (
     private val value: String
 
