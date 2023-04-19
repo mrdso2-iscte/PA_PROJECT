@@ -1,7 +1,7 @@
 class JBoolean (
     private val value: Boolean
 
-): JValue {
+): JLeaf {
     override fun toString(): String{
         return "$value"
     }

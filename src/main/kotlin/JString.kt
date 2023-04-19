@@ -1,7 +1,7 @@
 class JString (
     private val value: String
 
-): JValue {
+): JLeaf {
     override fun toString(): String{
         return "\"${value}\""
     }

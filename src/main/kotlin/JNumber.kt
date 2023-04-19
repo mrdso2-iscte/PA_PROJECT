@@ -1,6 +1,6 @@
 class JNumber(
     private val value: Number
-): JValue {
+): JLeaf {
     override fun toString(): String{
         return "$value"
     }

@@ -1,9 +1,6 @@
-
-
 interface JValue {
-   // val value: Any
-
-
-
+    fun accept(visitor: JVisitor){}
 
 }
+
+
