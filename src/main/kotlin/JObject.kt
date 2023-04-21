@@ -1,10 +1,10 @@
 data class JObject (
 
-    val value: List<JObjectAttribute>
+    private val value: List<JObjectAttribute>
 
 
 ) : JValue  {
-            private val listAttributes = mutableListOf<JObjectAttribute>()
+    val listAttributes = mutableListOf<JObjectAttribute>()
 
     init {
         value.forEach {
@@ -15,16 +15,16 @@ data class JObject (
 
         return listAttributes.joinToString(",\n", "{\n", "\n}"){it.toString()}
     }
-/*
+
     override fun accept(visitor: JVisitor) {
         visitor.visit(this)
-        listAttributes.forEach {
+        listAttributes.forEach{
             it.accept(visitor)
         }
 
     }
 
- */
+
 
 
 }
