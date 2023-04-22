@@ -1,4 +1,4 @@
-class JObject (
+class JObject(
 
     private val value: List<JObjectAttribute>
 

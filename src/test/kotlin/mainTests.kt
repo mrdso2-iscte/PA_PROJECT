@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 class mainTest{
     /*
@@ -28,10 +27,12 @@ class mainTest{
     val ects = JObjectAttribute("ects", JNumber(6.0))
     val dt = JObjectAttribute("data-exame", JNull())
 
-    val ins1= JObject(listOf(
-        JObjectAttribute("numero", JNumber(101101)),
-        JObjectAttribute("nome", JString("Dave Farley")),
-        JObjectAttribute("internacional", JBoolean(true))))
+    val ins1= JObject(
+        listOf(
+            JObjectAttribute("numero", JNumber(101101)),
+            JObjectAttribute("nome", JString("Dave Farley")),
+            JObjectAttribute("internacional", JBoolean(true)))
+    )
     val ins2= JObject(listOf(
         JObjectAttribute("numero", JNumber(101102)),
         JObjectAttribute("nome", JString("Martin Fowler")),
@@ -92,8 +93,9 @@ class mainTest{
     @Test
     fun testValidateStructure(){
         //duvida nao sei se é suposto fazer uma função que valide a estrutura do arry ou uma funçao que valide a estrutura de qualquer JValue
-        val isCorrect = ValidateStructure("inscritos", listOf<String>("numero", "nome", "internacional") )
-        myObject.accept(isCorrect)
+        val a = JArray(listOf(JString("a"), JString("b")))
+        val isCorrect = ValidateStructure()
+        a.accept(isCorrect)
         assertEquals(true, isCorrect.validator)
     }
 }

@@ -25,12 +25,21 @@ class ValidateProperty(val label: String , val kClass: KClass<*>): JVisitor{
         }
     }
 }
-class ValidateStructure(val label: String, val structure: List<String>):JVisitor{
+class ValidateStructure():JVisitor{
 
 
     var validator = true
     //nao sei o que é suposto fazer
-    override fun visit(jObject: JObject) {
+    //temos que verificar se existem JObject la dentro?
+    override fun visit(jArray: JArray) {
+        val isEqual= jArray.listValues[0]::class
+
+        jArray.listValues.forEach {
+            println("$isEqual $it")
+            if(isEqual != it::class){
+                validator = false
+            }
+        }
 
     }
 
