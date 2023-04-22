@@ -1,6 +1,6 @@
 interface JVisitor {
     fun visit(jObject: JObject){}
-   // fun visit(jArray:JArray){}
+    fun visit(jArray:JArray){}
     fun visit(jLeaf: JLeaf){}
     fun visit(jObjectAttribute: JObjectAttribute){}
 }
