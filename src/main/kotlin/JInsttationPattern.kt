@@ -1,7 +1,6 @@
-import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
 
-class JInstatiatonPattern () {
+class JInstatiatonPattern  {
 
 
     fun createObject(obj: Any?): JValue {
@@ -20,11 +19,9 @@ class JInstatiatonPattern () {
                 }.toMutableList()
                 JObject(list)
             }
-
             is Collection<*> -> JArray(obj.map { createObject(it!!) })
             else -> {
                 val list = mutableListOf<JObjectAttribute>()
-                println(obj::class.memberProperties)
                 obj::class.memberProperties.forEach {
                     list.add(JObjectAttribute(it.name, createObject(it.call(obj))))
                 }

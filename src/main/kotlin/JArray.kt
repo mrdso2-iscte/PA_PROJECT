@@ -1,4 +1,4 @@
-class JArray (private val value : List<JValue>): JValue {
+class JArray (value : List<JValue>): JValue {
     val listValues = mutableListOf<JValue>()
     init {
         value.forEach { listValues.add(it) }

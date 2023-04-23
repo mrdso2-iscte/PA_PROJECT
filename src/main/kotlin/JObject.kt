@@ -1,6 +1,6 @@
 class JObject(
 
-    private val value: List<JObjectAttribute>
+    value: List<JObjectAttribute>
 
 
 ) : JValue  {

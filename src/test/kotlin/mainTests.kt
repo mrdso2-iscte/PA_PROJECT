@@ -2,27 +2,8 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class mainTest{
-    /*
-    //UC 1
-    val ucname1 = JObjectAttribute("uc", JString("PA"))
-    val ects1 = JObjectAttribute("ects", JNumber(6.0))
-    val dt1 = JObjectAttribute("data-exame", JNull())
-    val b = JObjectAttribute("s/n", JBoolean(true))
-    val obj1 = JObject(listOf(ucname1, ects1, dt1,b))
-    val uc1 = JObjectAttribute("uc1", obj1)
-    //UC 2
-    val ucname2 = JObjectAttribute("uc", JString("PO"))
-    val ects2 = JObjectAttribute("ects", JNumber(3.0))
-    val obj2 = JObject(listOf(ucname2, ects2))
-    val uc2 = JObjectAttribute("uc2", obj2)
-    //UC3
-    val ucname3 = JObjectAttribute("uc", JString("IA"))
-    //val ects3 = JObjectAttribute("ects", JNumber(6.0))
-    val obj3 = JObject(listOf(ucname3))
-    val uc3 = JObjectAttribute("uc3", obj3)
-    */
 
-    /////////////////////////////////////////////////
+
     val uc = JObjectAttribute("uc", JString("PA"))
     val ects = JObjectAttribute("ects", JNumber(6.0))
     val dt = JObjectAttribute("data-exame", JNull())
@@ -92,10 +73,10 @@ class mainTest{
 
     @Test
     fun testValidateStructure(){
-        //duvida nao sei se é suposto fazer uma função que valide a estrutura do arry ou uma funçao que valide a estrutura de qualquer JValue
-        val a = JArray(listOf(JString("a"), JString("b")))
+
+        val a = JArray(listOf(JString("a"), JNumber(2)))
         val isCorrect = ValidateStructure()
-        a.accept(isCorrect)
+        inscritos.accept(isCorrect)
         assertEquals(true, isCorrect.validator)
     }
 }

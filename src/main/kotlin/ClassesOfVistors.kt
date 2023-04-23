@@ -1,4 +1,6 @@
 import kotlin.reflect.KClass
+
+
 class GetValuesWithLabel(private val label: String): JVisitor{
     val list  = mutableListOf<JValue>()
     override fun visit(jObject: JObject) {
@@ -16,7 +18,7 @@ class GetObjectsWithLabels(private val labels: List<String>):JVisitor {
     }
 }
 
-class ValidateProperty(val label: String , val kClass: KClass<*>): JVisitor{
+class ValidateProperty(private val label: String, private val kClass: KClass<*>): JVisitor{
     var validator = true //lançar excessao caso falso??
     override fun visit(jObject: JObject) {
         jObject.listAttributes.forEach {
@@ -25,24 +27,32 @@ class ValidateProperty(val label: String , val kClass: KClass<*>): JVisitor{
         }
     }
 }
-class ValidateStructure():JVisitor{
-
-
+class ValidateStructure: JVisitor{
     var validator = true
-    //nao sei o que é suposto fazer
-    //temos que verificar se existem JObject la dentro?
     override fun visit(jArray: JArray) {
-        val isEqual= jArray.listValues[0]::class
+        val isEqual= jArray.listValues[0]
+        jArray.listValues.forEachIndexed { index, it ->
+            if (index >= 1) {
+                println("$isEqual $it")
+                if (isEqual::class == it::class) {
+                    if (isEqual is JObject) {
+                        validator = validateJobject(isEqual, it as JObject)
+                    }
 
-        jArray.listValues.forEach {
-            println("$isEqual $it")
-            if(isEqual != it::class){
-                validator = false
+                } else validator = false
             }
         }
+    }
+    private fun validateJobject(obj1:JObject, obj2:JObject): Boolean{
+        val list1 = mutableListOf<Pair<String, KClass<*>>>()
+        obj1.listAttributes.forEach {  list1.add(Pair(it.label, it.value::class) ) }
+        val list2 = mutableListOf<Pair<String, KClass<*>>>()
+        obj2.listAttributes.forEach {  list2.add(Pair(it.label, it.value::class) ) }
+        return list1==list2
 
     }
 
 
 
 }
+

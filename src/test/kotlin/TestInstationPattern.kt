@@ -1,8 +1,4 @@
 import org.junit.jupiter.api.Test
-import java.util.ArrayList
-import java.util.Date
-
-
 data class Inscrito(
     val numero: Int,
     val nome: String,
@@ -12,7 +8,8 @@ data class Inscrito(
 data  class UnidadeCurricular(
     val uc: String,
     val ects: Double,
-    //val dataExame: String? = null,
+    //isto nao funciona HELP
+    val dataExame: String? = null,
     val inscritos: List<Inscrito>
 
 )
@@ -21,12 +18,11 @@ class TestInstationPattern {
     val ins2 = Inscrito(101102,"Martin Fowler",true)
     val ins3 = Inscrito(26503,"André Santos", false)
 
-    val uc = UnidadeCurricular("PA", 6.0,   listOf<Inscrito>(ins1,ins2,ins3))
+    val uc = UnidadeCurricular("PA", 6.0,  null, listOf<Inscrito>(ins1,ins2,ins3))
 
     @Test
     fun testCreateObject(){
         val i = JInstatiatonPattern()
-
         println(i.createObject(uc))
     }
 }
