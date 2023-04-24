@@ -1,7 +1,12 @@
+import jsonValues.*
 import org.junit.jupiter.api.Test
+import visitors.GetObjectsWithLabels
+import visitors.GetValuesWithLabel
+import visitors.ValidateProperty
+import visitors.ValidateStructure
 import kotlin.test.assertEquals
 
-class mainTest{
+class ModelTests{
 
 
     val uc = JObjectAttribute("uc", JString("PA"))
@@ -42,7 +47,7 @@ class mainTest{
 
         val etcsList = GetValuesWithLabel("numero")
         myObject.accept(etcsList)
-        val b = listOf<JValue>(JNumber(101101),JNumber(101102),JNumber(26503))
+        val b = listOf<JValue>(JNumber(101101), JNumber(101102), JNumber(26503))
         assertEquals(b.toString(), etcsList.list.toString())
 
     }
@@ -73,8 +78,6 @@ class mainTest{
 
     @Test
     fun testValidateStructure(){
-
-        val a = JArray(listOf(JString("a"), JNumber(2)))
         val isCorrect = ValidateStructure()
         inscritos.accept(isCorrect)
         assertEquals(true, isCorrect.validator)

@@ -1,3 +1,7 @@
+package jsonValues
+
+import visitors.JLeaf
+
 class JString (
     private val value: String
 

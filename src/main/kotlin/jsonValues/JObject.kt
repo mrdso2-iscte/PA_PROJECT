@@ -1,9 +1,13 @@
+package jsonValues
+
+import visitors.JVisitor
+
 class JObject(
 
     value: List<JObjectAttribute>
 
 
-) : JValue  {
+) : JValue {
     val listAttributes = mutableListOf<JObjectAttribute>()
 
     init {

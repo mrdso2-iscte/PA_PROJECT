@@ -1,3 +1,7 @@
+package jsonValues
+
+import visitors.JVisitor
+
 class JArray (value : List<JValue>): JValue {
     val listValues = mutableListOf<JValue>()
     init {

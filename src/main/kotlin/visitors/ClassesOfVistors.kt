@@ -1,7 +1,12 @@
+package visitors
+
+import jsonValues.JArray
+import jsonValues.JObject
+import jsonValues.JValue
 import kotlin.reflect.KClass
 
 
-class GetValuesWithLabel(private val label: String): JVisitor{
+class GetValuesWithLabel(private val label: String): JVisitor {
     val list  = mutableListOf<JValue>()
     override fun visit(jObject: JObject) {
         jObject.listAttributes.forEach {
@@ -9,7 +14,7 @@ class GetValuesWithLabel(private val label: String): JVisitor{
     }
 }
 
-class GetObjectsWithLabels(private val labels: List<String>):JVisitor {
+class GetObjectsWithLabels(private val labels: List<String>): JVisitor {
     val list = mutableListOf<JObject>()
     override fun visit(jObject: JObject) {
         val attributesList= mutableListOf<String>()
@@ -18,7 +23,7 @@ class GetObjectsWithLabels(private val labels: List<String>):JVisitor {
     }
 }
 
-class ValidateProperty(private val label: String, private val kClass: KClass<*>): JVisitor{
+class ValidateProperty(private val label: String, private val kClass: KClass<*>): JVisitor {
     var validator = true //lançar excessao caso falso??
     override fun visit(jObject: JObject) {
         jObject.listAttributes.forEach {
@@ -27,7 +32,7 @@ class ValidateProperty(private val label: String, private val kClass: KClass<*>)
         }
     }
 }
-class ValidateStructure: JVisitor{
+class ValidateStructure: JVisitor {
     var validator = true
     override fun visit(jArray: JArray) {
         val isEqual= jArray.listValues[0]
@@ -43,7 +48,7 @@ class ValidateStructure: JVisitor{
             }
         }
     }
-    private fun validateJobject(obj1:JObject, obj2:JObject): Boolean{
+    private fun validateJobject(obj1: JObject, obj2: JObject): Boolean{
         val list1 = mutableListOf<Pair<String, KClass<*>>>()
         obj1.listAttributes.forEach {  list1.add(Pair(it.label, it.value::class) ) }
         val list2 = mutableListOf<Pair<String, KClass<*>>>()

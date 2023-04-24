@@ -1,3 +1,7 @@
+package jsonValues
+
+import visitors.JVisitor
+
 class JObjectAttribute (
     val label: String,
     val value: JValue
@@ -11,11 +15,11 @@ class JObjectAttribute (
 
     fun accept(visitor: JVisitor) {
         visitor.visit(this)
-        if(value::class.simpleName == "JObject")
+        if(value::class.simpleName == "JsonValues.JObject")
         {val obj = value as JObject
             obj.accept(visitor)
         }
-        if(value::class.simpleName == "JArray")
+        if(value::class.simpleName == "JsonValues.JArray")
         {val jArray = value as JArray
             jArray.accept(visitor)
         }
