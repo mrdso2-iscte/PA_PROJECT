@@ -6,9 +6,18 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 
+/**
+ * A class that pass an Ojbect to JSON format
+ */
+
 class JInstatiatonPattern  {
 
-
+    /**
+     * Creates a [JValue] object based on the type of the given object [obj].
+     *
+     * @param obj The object to create a [JValue] from.
+     * @return A [JValue] object corresponding to the type of [obj].
+     */
     fun createObject(obj: Any?): JValue {
 
             return when (obj) {

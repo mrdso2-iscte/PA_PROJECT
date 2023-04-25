@@ -9,12 +9,12 @@ data class Inscrito(
 
 )
 data  class UnidadeCurricular(
-    @ChangeName("cadeira")
+    //@ChangeName("cadeira")
     val uc: String,
-    @AsJString
+    //@AsJString
     val ects: Double,
     val dataExame: String? = null,
-    @Ignore
+    //@Ignore
     val inscritos: List<Inscrito>
 
 )
@@ -25,6 +25,8 @@ class TestInstationPattern {
 
     private val uc = UnidadeCurricular("PA", 6.0, null,  listOf(ins1,ins2,ins3))
 
+
+    //para efeitos de teste comentar as anotações
     @Test
     fun testCreateObject(){
         val i = JInstatiatonPattern()
@@ -48,18 +50,72 @@ class TestInstationPattern {
                 "}"
        assertEquals(json, i.createObject(uc).toString())
     }
+    //para efeitos de teste comentar as seguintes anotações:  @AsJString e //@ChangeName("cadeira")
     @Test
-    fun  testAnnotations(){
+    fun  testAnnotationIgnore(){
         val i = JInstatiatonPattern()
         val json ="{\n" +
                 "\"dataExame\" : null,\n" +
-                "\"ects\" : \"6.0\",\n" +
-                "\"cadeira\" : \"PA\"\n" +
+                "\"ects\" : 6.0,\n" +
+                "\"uc\" : \"PA\"\n" +
                 "}"
         assertEquals(json, i.createObject(uc).toString())
 
 
     }
+
+    //para efeitos de teste comentar as seguintes anotações:  @AsJString e  @Ignore
+    @Test
+    fun  testAnnotationChangeName(){
+        val i = JInstatiatonPattern()
+        val json = "{\n" +
+                "\"dataExame\" : null,\n" +
+                "\"ects\" : 6.0,\n" +
+                "\"inscritos\" : [{\n" +
+                "\"internacional\" : true,\n" +
+                "\"nome\" : \"Dave Farley\",\n" +
+                "\"numero\" : 101101\n" +
+                "},{\n" +
+                "\"internacional\" : true,\n" +
+                "\"nome\" : \"Martin Fowler\",\n" +
+                "\"numero\" : 101102\n" +
+                "},{\n" +
+                "\"internacional\" : false,\n" +
+                "\"nome\" : \"André Santos\",\n" +
+                "\"numero\" : 26503\n" +
+                "}],\n" +
+                "\"cadeira\" : \"PA\"\n" +
+                "}"
+        assertEquals(json, i.createObject(uc).toString())
+
+    }
+    //para efeitos de teste comentar as seguintes anotações:   //@Ignore e //@ChangeName("cadeira")
+    @Test
+    fun  testAnnotationAsString(){
+        val i = JInstatiatonPattern()
+        val json ="{\n" +
+                "\"dataExame\" : null,\n" +
+                "\"ects\" : \"6.0\",\n" +
+                "\"inscritos\" : [{\n" +
+                "\"internacional\" : true,\n" +
+                "\"nome\" : \"Dave Farley\",\n" +
+                "\"numero\" : 101101\n" +
+                "},{\n" +
+                "\"internacional\" : true,\n" +
+                "\"nome\" : \"Martin Fowler\",\n" +
+                "\"numero\" : 101102\n" +
+                "},{\n" +
+                "\"internacional\" : false,\n" +
+                "\"nome\" : \"André Santos\",\n" +
+                "\"numero\" : 26503\n" +
+                "}],\n" +
+                "\"uc\" : \"PA\"\n" +
+                "}"
+        assertEquals(json, i.createObject(uc).toString())
+
+
+    }
+
 
 
 
