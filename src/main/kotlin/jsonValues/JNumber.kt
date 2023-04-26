@@ -7,7 +7,7 @@ import visitors.JLeaf
  *
  * @property value the Number value represented by this [JNumber].
  */
-class JNumber(
+data class JNumber(
     private val value: Number
 ): JLeaf {
 

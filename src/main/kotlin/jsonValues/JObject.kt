@@ -7,9 +7,9 @@ import visitors.JVisitor
  *
  * @property[value] is a list of [JObjectAttribute] representing the attributes of the object.
  */
-class JObject(
+data class JObject(
 
-    value: List<JObjectAttribute>
+    val value: List<JObjectAttribute>
 
 
 ) : JValue {

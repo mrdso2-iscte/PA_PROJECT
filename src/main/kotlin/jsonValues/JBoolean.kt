@@ -6,7 +6,7 @@ import visitors.JLeaf
  *
  * @property value the boolean value represented by [JBoolean].
  */
-class JBoolean (
+data class JBoolean (
     private val value: Boolean
 
 ): JLeaf {

@@ -9,46 +9,19 @@ import kotlin.test.assertEquals
 class ModelTests{
 
 
-    val uc = JObjectAttribute("uc", JString("PA"))
-    val ects = JObjectAttribute("ects", JNumber(6.0))
-    val dt = JObjectAttribute("data-exame", JNull())
-
-    val ins1= JObject(
-        listOf(
-            JObjectAttribute("numero", JNumber(101101)),
-            JObjectAttribute("nome", JString("Dave Farley")),
-            JObjectAttribute("internacional", JBoolean(true)))
-    )
-    val ins2= JObject(listOf(
-        JObjectAttribute("numero", JNumber(101102)),
-        JObjectAttribute("nome", JString("Martin Fowler")),
-        JObjectAttribute("internacional", JBoolean(true))))
-    val ins3= JObject(listOf(
-        JObjectAttribute("numero", JNumber(26503)),
-        JObjectAttribute("nome", JString("André Santos")),
-        JObjectAttribute("internacional", JBoolean(false))))
-    val inscritos = JArray(listOf(ins1,ins2,ins3))
-
-    val ins = JObjectAttribute("inscritos", inscritos)
-
-
-    val myObject = JObject(listOf(uc,ects,dt,ins))
-
-
-
     @Test
     fun testGetValuesWithLabel(){
 
         val ucList = GetValuesWithLabel("uc")
         myObject.accept(ucList)
         val a = listOf<JValue>(JString("PA"))
-        assertEquals(a.toString(), ucList.list.toString())
+        assertEquals(a, ucList.list)
 
 
         val etcsList = GetValuesWithLabel("numero")
         myObject.accept(etcsList)
         val b = listOf<JValue>(JNumber(101101), JNumber(101102), JNumber(26503))
-        assertEquals(b.toString(), etcsList.list.toString())
+        assertEquals(b, etcsList.list)
 
     }
     @Test
@@ -57,12 +30,13 @@ class ModelTests{
         val ucList = GetObjectsWithLabels(listOf("uc","ects") )
         myObject.accept(ucList)
         val a = listOf<JValue>(myObject)
-       assertEquals(a.toString(), ucList.list.toString())
+       assertEquals(a, ucList.list)
 
         val objList = GetObjectsWithLabels(listOf("numero", "nome") )
         myObject.accept(objList)
-        val b = listOf<JValue>(ins1, ins2,ins3)
-        assertEquals(b.toString(), objList.list.toString())
+        val inscritos = listOf<JValue>(jIns1, jIns2, jIns3)
+
+        assertEquals(inscritos, objList.list)
     }
 
     @Test
@@ -79,7 +53,7 @@ class ModelTests{
     @Test
     fun testValidateStructure(){
         val isCorrect = ValidateStructure()
-        inscritos.accept(isCorrect)
+        jInscritos.accept(isCorrect)
         assertEquals(true, isCorrect.validator)
     }
 }

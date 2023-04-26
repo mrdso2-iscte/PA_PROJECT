@@ -9,7 +9,7 @@ import visitors.JVisitor
  * @property value the value of the attribute, represented as a [JValue].
  */
 
-class JObjectAttribute (
+data class JObjectAttribute (
     val label: String,
     val value: JValue
 ): JVisitor
@@ -41,7 +41,6 @@ class JObjectAttribute (
         }
         if(value::class.simpleName == "JArray")
         {val jArray = value as JArray
-            println("entrei")
             jArray.accept(visitor)
         }
 

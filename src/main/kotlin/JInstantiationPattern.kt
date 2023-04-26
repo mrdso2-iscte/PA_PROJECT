@@ -2,9 +2,21 @@ import annotations.AsJString
 import annotations.ChangeName
 import annotations.Ignore
 import jsonValues.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.primaryConstructor
+
+val KClass<*>.dataClassFields: List<KProperty<*>>
+    get() {
+        require(isData) { "instance must be data class" }
+        return primaryConstructor!!.parameters.map { p ->
+            declaredMemberProperties.find { it.name == p.name }!!
+        }
+    }
+
 
 /**
  * A class that pass an Ojbect to JSON format
@@ -21,7 +33,7 @@ class JInstatiatonPattern  {
     fun createObject(obj: Any?): JValue {
 
             return when (obj) {
-                null -> JNull()
+                null -> JNull
                 is Boolean -> JBoolean(obj)
                 is String -> JString(obj)
                 is Char -> JString(obj.toString())
@@ -38,7 +50,8 @@ class JInstatiatonPattern  {
                 }
                 else -> {
                     val list = mutableListOf<JObjectAttribute>()
-                    obj::class.memberProperties.filter { !it.hasAnnotation<Ignore>() }.forEach {
+                    println("obj " +obj::class.dataClassFields)
+                    obj::class.dataClassFields.filter { !it.hasAnnotation<Ignore>() }.forEach {
                         list.add(
                             JObjectAttribute(
                             if (it.hasAnnotation<ChangeName>()) it.findAnnotation<ChangeName>()!!.name else it.name,

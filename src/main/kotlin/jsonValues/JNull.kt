@@ -5,7 +5,7 @@ import visitors.JLeaf
 /**
  * Represents a JSON null value.
  */
-class JNull: JLeaf {
+object JNull: JLeaf {
 
     /**
      * @return a string representation of the [JNull] value.

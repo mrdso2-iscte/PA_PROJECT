@@ -7,7 +7,7 @@ import visitors.JLeaf
  *
  * @property value the boolean value represented by this [JString].
  */
-class JString (
+data class JString (
     private val value: String
 
 ): JLeaf {

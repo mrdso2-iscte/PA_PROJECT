@@ -7,7 +7,7 @@ import visitors.JVisitor
  *
  * @property value is a list of [JValue] representing the attributes of the object.
  */
-class JArray (value : List<JValue>): JValue {
+data class JArray (val value : List<JValue>): JValue {
     val listValues = mutableListOf<JValue>()
 
     /**
