@@ -24,6 +24,7 @@ class JInstatiatonPattern  {
                 null -> JNull()
                 is Boolean -> JBoolean(obj)
                 is String -> JString(obj)
+                is Char -> JString(obj.toString())
                 is Int -> JNumber(obj)
                 is Double -> JNumber(obj)
                 is Float -> JNumber(obj)
@@ -34,7 +35,6 @@ class JInstatiatonPattern  {
                     }.toMutableList()
                     JObject(list)
                 }
-
                 is Collection<*> -> JArray(obj.map { createObject(it!!) })
                 else -> {
                     val list = mutableListOf<JObjectAttribute>()
@@ -52,8 +52,5 @@ class JInstatiatonPattern  {
 
 
     }
-
-
-
 
 }
