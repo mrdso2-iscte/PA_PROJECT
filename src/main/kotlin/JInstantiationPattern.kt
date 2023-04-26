@@ -29,13 +29,13 @@ class JInstatiatonPattern  {
                 is Double -> JNumber(obj)
                 is Float -> JNumber(obj)
                 is Enum<*> -> JString(obj.name)
+                is Iterable<*> -> JArray(obj.map { createObject(it!!) })
                 is Map<*, *> -> {
                     val list = obj.map { (k, v) ->
                         JObjectAttribute(k.toString(), createObject(v!!))
                     }.toMutableList()
                     JObject(list)
                 }
-                is Collection<*> -> JArray(obj.map { createObject(it!!) })
                 else -> {
                     val list = mutableListOf<JObjectAttribute>()
                     obj::class.memberProperties.filter { !it.hasAnnotation<Ignore>() }.forEach {

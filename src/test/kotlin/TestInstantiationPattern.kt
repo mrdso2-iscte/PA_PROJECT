@@ -115,6 +115,12 @@ class TestInstationPattern {
 
 
     }
+    @Test
+    fun listTest(){
+        val i = JInstatiatonPattern()
+        val a =listOf("a", "b", "c")
+        println(i.createObject(a).toString())
+    }
 
 
 
