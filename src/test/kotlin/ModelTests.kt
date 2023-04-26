@@ -57,7 +57,7 @@ class ModelTests{
         val ucList = GetObjectsWithLabels(listOf("uc","ects") )
         myObject.accept(ucList)
         val a = listOf<JValue>(myObject)
-        assertEquals(a.toString(), ucList.list.toString())
+       assertEquals(a.toString(), ucList.list.toString())
 
         val objList = GetObjectsWithLabels(listOf("numero", "nome") )
         myObject.accept(objList)
