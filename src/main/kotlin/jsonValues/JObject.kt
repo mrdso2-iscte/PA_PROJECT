@@ -9,7 +9,7 @@ import visitors.JVisitor
  */
 data class JObject(
 
-    val value: List<JObjectAttribute>
+     private val value: List<JObjectAttribute>
 
 
 ) : JValue {
