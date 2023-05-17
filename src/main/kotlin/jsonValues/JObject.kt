@@ -14,6 +14,9 @@ data class JObject(
 
 ) : JValue {
     val listAttributes = mutableListOf<JObjectAttribute>()
+    private val observers: MutableList<JObjectObserver> = mutableListOf()
+    fun addObserver(observer: JObjectObserver) = observers.add(observer)
+
 
     /**
      * Initializes the [listAttributes] with the [value] provided.
@@ -22,6 +25,7 @@ data class JObject(
         value.forEach {
             listAttributes.add(it)
         }
+
     }
     /**
      * @return a string representation of the [JObject] value.
@@ -43,10 +47,23 @@ data class JObject(
 
     }
 
+    fun add( attribute: JObjectAttribute){
+
+        if(listAttributes.add(attribute))
+        observers.forEach {
+            it.attributeAdded(attribute) }
+    }
+
+}
+interface JObjectObserver{
+    fun attributeAdded(attribute: JObjectAttribute){}
+
 
 
 
 }
+
+
 
 
 
