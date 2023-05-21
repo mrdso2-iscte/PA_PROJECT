@@ -19,7 +19,7 @@ class Help {
         layout = GridLayout(0, 2)
         size = Dimension(600, 600)
 
-    val leftView1=LeftView1(model)
+    val leftView1=LeftView(model)
     val scrollPane = JScrollPane(leftView1).apply {
         horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
@@ -35,7 +35,7 @@ class Help {
     })
 
 
-    val right = RightView()
+    val right = RightView(model)
     add(right)
 
     }

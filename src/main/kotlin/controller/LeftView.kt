@@ -9,7 +9,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-class LeftView1(model: JObject): JPanel() {
+class LeftView(private val model: JObject): JPanel() {
 
     private val observers: MutableList<LeftView1Observer> = mutableListOf()
     fun addObserver(observer: LeftView1Observer) = observers.add(observer)
