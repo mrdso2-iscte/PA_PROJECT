@@ -26,12 +26,14 @@ class Help {
     }
     add(scrollPane)
 
-    leftView1.addObserver(object : LeftView1Observer{
-        override fun attributeAdded(attribute: JObjectAttribute) {
+    leftView1.addObserver(object : LeftViewObserver{
+        override fun componentAdded(attribute: JObjectAttribute) {
             model.add(attribute)
-           println( model.toString())
         }
 
+        override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+            model.update(oldAttribute, newAttribute)
+        }
     })
 
 
@@ -42,9 +44,8 @@ class Help {
     fun open() {
         frame.isVisible = true
     }
-
-
 }
+
 fun main(){
     Help().open()
 }

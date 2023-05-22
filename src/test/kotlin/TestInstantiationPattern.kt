@@ -22,8 +22,6 @@ data  class UnidadeCurricular(
 class TestInstationPattern {
 
 
-
-
     //for test purposes, comment the following annotations: @AsJString, @ChangeName("cadeira") and @Ignore
     @Test
     fun testCreateObject(){
@@ -36,8 +34,6 @@ class TestInstationPattern {
         val i = JInstatiatonPattern()
         val jObject = JObject(listOf(jUc, jEcts, jDt))
         assertEquals(jObject, i.createObject(uc))
-
-
     }
 
     //for test purposes, comment the following annotations:   @AsJString and  @Ignore

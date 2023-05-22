@@ -16,8 +16,15 @@ class RightView(private val model: JObject): JPanel(){
         srcArea.text = "$model"
         model.addObserver(object : JObjectObserver {
             override fun attributeAdded(attribute: JObjectAttribute) {
+                println("Attributes: " + model.listAttributes)
+                srcArea.text = "$model"
+            }
+
+            override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
                 srcArea.text = "$model"
             }
         })
     }
+
+
 }

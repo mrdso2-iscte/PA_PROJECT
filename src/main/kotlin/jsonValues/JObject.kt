@@ -48,15 +48,25 @@ data class JObject(
     }
 
     fun add( attribute: JObjectAttribute){
-
         if(listAttributes.add(attribute))
         observers.forEach {
             it.attributeAdded(attribute) }
+    }
+    fun update(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute){
+       if(listAttributes.remove(oldAttribute)){
+           listAttributes.add(newAttribute)
+           println(newAttribute.value.javaClass)
+           observers.forEach{
+               it.attributeUpdated(oldAttribute,newAttribute)
+           }
+       }
     }
 
 }
 interface JObjectObserver{
     fun attributeAdded(attribute: JObjectAttribute){}
+
+    fun attributeUpdated(oldAttribute: JObjectAttribute,newAttribute: JObjectAttribute){}
 
 
 
