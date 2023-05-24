@@ -25,7 +25,7 @@ class RightView(private val model: JObject): JPanel(){
                 srcArea.text = "$model"
                 if(newAttribute.value.javaClass == JArray::class.java)
                     println("RIGHT VIEW: RECEBI UM NOVO ATRIBUTO ARRAY")
-                println("ATRIBUTOS ESTAO A MUDAR MERDAS ESTAO A ACONTECER")
+                println("RECEBI UM NOVO ATRIBUTO: " + newAttribute.value::class)
             }
         })
     }

@@ -26,11 +26,13 @@ class LeftView(private val model: JObject) : JPanel() {
             }
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
-                if(newAttribute.value.javaClass == JArray::class.java)
-                    println("LEFT VIEW: O NOVO ATRIBUTO AGORA VAI SER UM ARRAY")
-                    updateWidget(newAttribute) //SOLUCAO DO PROBLEMA É AQUI, PARA ISSO TEM DE DESCOBRIR QUAL É O PANEL QUE TEM AQUELA LABEL
 
-            }
+                println("LEFT VIEW: devia dar Update ${newAttribute.value}")
+                if(newAttribute.value is JArray)
+                    println("LEFT VIEW: O NOVO ATRIBUTO AGORA VAI SER UM ARRAY")
+                    updateWidget(oldAttribute, newAttribute) //SOLUCAO DO PROBLEMA É AQUI, PARA ISSO TEM DE DESCOBRIR QUAL É O PANEL QUE TEM AQUELA LABEL
+                  }
+
 
         })
         add(AttributeComponent())
@@ -38,23 +40,9 @@ class LeftView(private val model: JObject) : JPanel() {
     }
 
 
-    //PUS ISTO AQUI GUIDA: FUNCAO DO CHAT QUE ENCONTRA UM JPANEL ALGURES NO JPANEL GERAL, COM BASE NA LABEL QUE ELE TEM
-    fun findChildPanel(parentPanel: JPanel, targetLabel: JLabel): JPanel? {
-        val components = parentPanel.components
-        for (component in components) {
-            if (component is JPanel) {
-                val childComponents = component.components
-                for (childComponent in childComponents) {
-                    if (childComponent == targetLabel) {
-                        return component
-                    }
-                }
-            }
-        }
-        return null
-    }
 
-    private fun updateWidget(newAttribute: JObjectAttribute) {
+    private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+
 
     }
 
@@ -66,7 +54,9 @@ class LeftView(private val model: JObject) : JPanel() {
     }
 
 
-    inner class AttributeComponent() : JPanel() {
+
+
+   inner class AttributeComponent() : JPanel() {
         inner class MouseClick() : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 if (e != null) {
@@ -120,6 +110,8 @@ class LeftView(private val model: JObject) : JPanel() {
                         println("PARABENS!!!!!!!!!! CLICASTE NO ENTER PARA MUDAR UM VALOR")
                         observers.forEach {
                             val updatedAttribute = JObjectAttribute(label, textToJValue(text))
+//                            print("TEXTFIELD ENTER: ${text}   ,  ${textToJValue(text)}" )
+                            println("vou chamar o attributeModified : " + value)
                             it.attributeModified(JObjectAttribute(label,value), updatedAttribute)
                         }
                     }
@@ -146,7 +138,6 @@ class LeftView(private val model: JObject) : JPanel() {
             //MUDEI ISTO GUIDA: AGORA HA UM TEXTFIELDPANEL PARA POR O(S) JTEXTFIELD(S)
             val textFieldPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-
                 add(createTextField(label, value))
             }
 
@@ -162,6 +153,8 @@ class LeftView(private val model: JObject) : JPanel() {
                             println("LEFTVIEW: CLICASTE NUMA LABEL COM UM VALUE " + value.javaClass)
                             if(value.javaClass == JArray::class.java) { //PROBLEMA GUIDA: ELE NAO DA UPDATE DO VALUE AQUI, ELE ACHA QUE TEM ALI UM JNULL PRA SEMPRE
                                 println("LEFT VIEW: ESTAS A CARREGAR NUM ATRIBUTO QUE JA E ARRAY")
+                                if((value as JArray).listValues.add(JNull)) {
+                                    val newAttribute = JObjectAttribute(label,value)}
                             }else{
                                 println("LEFT VIEW: ESTAS A CARREGAR NUM ATRIBUTO QUE NAO E ARRAY")
                                 val oldAttribute = JObjectAttribute(label, value)
@@ -169,9 +162,9 @@ class LeftView(private val model: JObject) : JPanel() {
                                 observers.forEach {
                                     //MUDEI ISTO GUIDA: AGORA O LEFTVIEW TB CHAMA O ATTRIBUTEMODIFIED PARA DAR O ATRIBUTO NOVO CUJO VALOR AGORA VAI SER UM JARRAY (QUE ESTA OVERRIDEN NO INIT)
                                     it.attributeModified(oldAttribute, newAttribute) }
-                                textFieldPanel.add(createTextField("N/A", value))
-//                                    textFieldPanel.add(JTextField("N/A"))
-                                model.update(oldAttribute, newAttribute)
+                                textFieldPanel.add(createTextField("N/A", JNull))
+//                              textFieldPanel.add(JTextField("N/A"))
+//                              model.update(oldAttribute, newAttribute)
                             }
                             repaint()
                             revalidate()
@@ -186,6 +179,97 @@ class LeftView(private val model: JObject) : JPanel() {
             add(textFieldPanel)
 
         }
+
+
+    inner class WidgetComponent(private val label: String, private var value:JValue): JPanel(){
+        init {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            alignmentX = Component.LEFT_ALIGNMENT
+            alignmentY = Component.TOP_ALIGNMENT
+            border = LineBorder(Color.ORANGE, 4, true)
+
+            //MUDEI ISTO GUIDA: AGORA HA UMA LABELPANEL PARA POR A JLABEL
+            val labelPanel = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.X_AXIS)
+                val jlabel = JLabel(label)
+
+                add(jlabel)
+            }
+
+            //MUDEI ISTO GUIDA: AGORA HA UM TEXTFIELDPANEL PARA POR O(S) JTEXTFIELD(S)
+            val textFieldPanel = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                add(createTextField(label, value))
+            }
+
+
+
+            addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent?) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        val menu = JPopupMenu("Message")
+                        val add = JButton("add")
+
+                        add.addActionListener {
+                            println("LEFTVIEW: CLICASTE NUMA LABEL COM UM VALUE " + value.javaClass)
+                            if (value.javaClass == JArray::class.java) { //PROBLEMA GUIDA: ELE NAO DA UPDATE DO VALUE AQUI, ELE ACHA QUE TEM ALI UM JNULL PRA SEMPRE
+                                println("LEFT VIEW: ESTAS A CARREGAR NUM ATRIBUTO QUE JA E ARRAY")
+                                if ((value as JArray).listValues.add(JNull)) {
+                                    val newAttribute = JObjectAttribute(label, value)
+                                }
+                            } else {
+                                println("LEFT VIEW: ESTAS A CARREGAR NUM ATRIBUTO QUE NAO E ARRAY")
+                                val oldAttribute = JObjectAttribute(label, value)
+                                val newAttribute = JObjectAttribute(label, JArray(listOf(value, JNull)))
+                                observers.forEach {
+                                    //MUDEI ISTO GUIDA: AGORA O LEFTVIEW TB CHAMA O ATTRIBUTEMODIFIED PARA DAR O ATRIBUTO NOVO CUJO VALOR AGORA VAI SER UM JARRAY (QUE ESTA OVERRIDEN NO INIT)
+                                    it.attributeModified(oldAttribute, newAttribute)
+                                }
+                                textFieldPanel.add(createTextField("N/A", JNull))
+//                              textFieldPanel.add(JTextField("N/A"))
+//                              model.update(oldAttribute, newAttribute)
+                            }
+                            repaint()
+                            revalidate()
+                        }
+                        menu.add(add);
+                        menu.show(this@WidgetComponent, 100, 100)
+                    }
+                }
+            })
+
+
+            add(labelPanel)
+            add(textFieldPanel)
+        }
+
+        fun modify(newAttribute: JObjectAttribute) {
+            value = newAttribute.value
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 interface LeftViewObserver {
