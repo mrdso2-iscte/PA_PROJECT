@@ -23,9 +23,9 @@ class RightView(private val model: JObject): JPanel(){
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
                 srcArea.text = "$model"
+                println(model.toString())
                 if(newAttribute.value.javaClass == JArray::class.java)
                     println("RIGHT VIEW: RECEBI UM NOVO ATRIBUTO ARRAY")
-                println("RECEBI UM NOVO ATRIBUTO: " + newAttribute.value::class)
             }
         })
     }

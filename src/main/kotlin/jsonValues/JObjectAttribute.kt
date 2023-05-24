@@ -11,7 +11,7 @@ import visitors.JVisitor
 
 data class JObjectAttribute (
     val label: String,
-    val value: JValue
+    var value: JValue
 ): JVisitor
 {
 
