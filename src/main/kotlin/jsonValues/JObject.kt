@@ -47,7 +47,7 @@ data class JObject(
 
     }
 
-    fun add( attribute: JObjectAttribute){
+    fun add(attribute: JObjectAttribute){
         if(listAttributes.add(attribute))
         observers.forEach {
             it.attributeAdded(attribute) }
@@ -55,7 +55,7 @@ data class JObject(
     fun update(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute){
        if(listAttributes.remove(oldAttribute)){
            listAttributes.add(newAttribute)
-           println(newAttribute.value.javaClass)
+           println("JOBJECT: UPDATING WITH " + newAttribute.value.javaClass)
            observers.forEach{
                it.attributeUpdated(oldAttribute,newAttribute)
            }

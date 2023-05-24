@@ -1,5 +1,6 @@
 package controller
 
+import jsonValues.JArray
 import jsonValues.JObject
 import jsonValues.JObjectAttribute
 import jsonValues.JObjectObserver
@@ -22,6 +23,9 @@ class RightView(private val model: JObject): JPanel(){
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
                 srcArea.text = "$model"
+                if(newAttribute.value.javaClass == JArray::class.java)
+                    println("RIGHT VIEW: RECEBI UM NOVO ATRIBUTO ARRAY")
+                println("ATRIBUTOS ESTAO A MUDAR MERDAS ESTAO A ACONTECER")
             }
         })
     }

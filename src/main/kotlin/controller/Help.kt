@@ -1,9 +1,7 @@
 package controller
 
 
-import jsonValues.JNull
-import jsonValues.JObject
-import jsonValues.JObjectAttribute
+import jsonValues.*
 import java.awt.Dimension
 import java.awt.GridLayout
 import javax.swing.JFrame
@@ -12,7 +10,23 @@ import javax.swing.JScrollPane
 
 class Help {
 
-    val model = JObject(listOf( JObjectAttribute("ola", JNull)))
+    val inscritos1 = JObject(listOf(
+        JObjectAttribute("numero", JNumber(1)),
+        JObjectAttribute("nome", JString("André")),
+        JObjectAttribute("internacional", JBoolean(false))
+    ))
+    val inscritos2 = JObject(listOf(
+        JObjectAttribute("numero", JNumber(2)),
+        JObjectAttribute("nome", JString("Miguel")),
+        JObjectAttribute("internacional", JBoolean(true))
+    ))
+
+    val cursos = JObject(listOf(
+        JObjectAttribute("cursos", JArray(listOf(JString("MEI"), JString("LCD"))))
+    ))
+
+//    val model = JObject(listOf(  JObjectAttribute("inscritos", JArray(listOf(inscritos1, inscritos2)))))
+    val model = JObject(listOf( JObjectAttribute("cursos", JNull)))
 
     private val frame=JFrame("Json Editor").apply {
         defaultCloseOperation = javax.swing.JFrame.EXIT_ON_CLOSE
