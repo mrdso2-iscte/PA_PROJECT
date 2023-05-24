@@ -52,14 +52,30 @@ data class JObject(
         observers.forEach {
             it.attributeAdded(attribute) }
     }
+//    fun update(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute){
+//
+//       if(listAttributes.remove(oldAttribute)){
+//           listAttributes.add(newAttribute)
+//           println("JOBJECT: UPDATING WITH " + newAttribute.toString())
+//           observers.forEach{
+//               it.attributeUpdated(oldAttribute,newAttribute)
+//           }
+//       } else {
+//           println("Nao consegui remover do model ")
+//       }
+//    }
+
     fun update(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute){
-       if(listAttributes.remove(oldAttribute)){
-           listAttributes.add(newAttribute)
-           println("JOBJECT: UPDATING WITH " + newAttribute.value.javaClass)
-           observers.forEach{
-               it.attributeUpdated(oldAttribute,newAttribute)
-           }
-       }
+
+        if(listAttributes.remove(oldAttribute)){
+            listAttributes.add(newAttribute)
+            println("JOBJECT: UPDATING WITH " + newAttribute.toString())
+            observers.forEach{
+                it.attributeUpdated(oldAttribute,newAttribute)
+            }
+        } else {
+            println("Nao consegui remover do model ")
+        }
     }
 
 }

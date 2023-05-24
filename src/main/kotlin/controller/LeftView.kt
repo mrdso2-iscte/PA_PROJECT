@@ -16,13 +16,13 @@ class LeftView(private val model: JObject) : JPanel() {
     init {
         layout = GridLayout(0, 1)
         model.listAttributes.forEach {
-            addObject(it)
+            addAttribute(it)
 
         }
 
         model.addObserver(object : JObjectObserver {
             override fun attributeAdded(attribute: JObjectAttribute) {
-                addObject(attribute)
+                addAttribute(attribute)
             }
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
@@ -35,7 +35,7 @@ class LeftView(private val model: JObject) : JPanel() {
 
 
         })
-        add(AttributeComponent())
+        add(MenuComponent())
 
     }
 
@@ -47,8 +47,9 @@ class LeftView(private val model: JObject) : JPanel() {
     }
 
 
-    private fun addObject(attribute: JObjectAttribute) {
-        add(testWidget(attribute.label,attribute.value))
+    private fun addAttribute(attribute: JObjectAttribute) {
+//        add(testWidget(attribute.label,attribute.value))
+        add(AttributeComponent(attribute.label,attribute.value))
         revalidate()
         repaint()
     }
@@ -56,7 +57,7 @@ class LeftView(private val model: JObject) : JPanel() {
 
 
 
-   inner class AttributeComponent() : JPanel() {
+   inner class MenuComponent() : JPanel() {
         inner class MouseClick() : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 if (e != null) {
@@ -72,7 +73,7 @@ class LeftView(private val model: JObject) : JPanel() {
                         }
                     }
                     menu.add(add)
-                    menu.show(this@AttributeComponent, 100, 100)
+                    menu.show(this@MenuComponent, 100, 100)
                 }
 
             }
@@ -97,7 +98,6 @@ class LeftView(private val model: JObject) : JPanel() {
             text.isEmpty() -> JNull
             else -> JString(text)
         }
-
     }
 
 
@@ -181,7 +181,7 @@ class LeftView(private val model: JObject) : JPanel() {
         }
 
 
-    inner class WidgetComponent(private val label: String, private var value:JValue): JPanel(){
+    inner class AttributeComponent(private val label: String, private var value:JValue): JPanel(){
         init {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -233,7 +233,7 @@ class LeftView(private val model: JObject) : JPanel() {
                             revalidate()
                         }
                         menu.add(add);
-                        menu.show(this@WidgetComponent, 100, 100)
+                        menu.show(this@AttributeComponent, 100, 100)
                     }
                 }
             })
