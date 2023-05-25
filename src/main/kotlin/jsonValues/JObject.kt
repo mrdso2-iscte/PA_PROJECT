@@ -1,6 +1,7 @@
 package jsonValues
 
 import visitors.JVisitor
+import java.text.FieldPosition
 
 /**
  * Represents a JSON object value.
@@ -63,6 +64,35 @@ data class JObject(
             }
         }
     }
+    fun objectDeleted(attribute: JObjectAttribute){
+        if(listAttributes.remove(attribute)){
+            observers.forEach{
+                it.deleteObject(attribute)
+            }
+        }
+    }
+    fun deleteAttribute(attribute: JObjectAttribute, position: Int){
+
+        if(attribute.value !is JArray)  objectDeleted(attribute)
+        else{
+            (attribute.value as JArray).listValues.removeAt(position)
+            observers.forEach{
+                it.deleteAttribute(attribute,position)
+            }
+            if((attribute.value as JArray).listValues.size==1){
+                update(attribute,JObjectAttribute(attribute.label,(attribute.value as JArray).listValues[0]))
+            }
+
+        }
+
+    }
+    fun deleteAll(){
+        listAttributes.clear()
+        observers.forEach{
+            it.allObjectsDeleted()
+        }
+    }
+
 
 }
 interface JObjectObserver{
@@ -70,10 +100,14 @@ interface JObjectObserver{
 
     fun attributeUpdated(oldAttribute: JObjectAttribute,newAttribute: JObjectAttribute){}
 
+    fun deleteObject(attribute: JObjectAttribute){}
+    fun deleteAttribute(attribute: JObjectAttribute, position: Int){}
+    fun allObjectsDeleted(){}
 
 
 
 }
+
 
 
 

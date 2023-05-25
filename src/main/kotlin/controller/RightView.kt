@@ -1,6 +1,5 @@
 package controller
 
-import jsonValues.JArray
 import jsonValues.JObject
 import jsonValues.JObjectAttribute
 import jsonValues.JObjectObserver
@@ -17,15 +16,23 @@ class RightView(private val model: JObject): JPanel(){
         srcArea.text = "$model"
         model.addObserver(object : JObjectObserver {
             override fun attributeAdded(attribute: JObjectAttribute) {
-//                println("Attributes: " + model.listAttributes)
                 srcArea.text = "$model"
             }
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
                 srcArea.text = "$model"
-//                println(model.toString())
-//                if(newAttribute.value.javaClass == JArray::class.java)
-//                    println("RIGHT VIEW: RECEBI UM NOVO ATRIBUTO ARRAY")
+            }
+
+            override fun deleteObject(attribute: JObjectAttribute) {
+                srcArea.text = "$model"
+            }
+
+            override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
+                srcArea.text = "$model"
+            }
+
+            override fun allObjectsDeleted() {
+                srcArea.text = "$model"
             }
         })
     }

@@ -49,6 +49,18 @@ class Help {
 
             model.update(oldAttribute, newAttribute)
         }
+
+        override fun deleteAllObjects() {
+            model.deleteAll()
+        }
+
+        override fun deleteObject(attribute: JObjectAttribute) {
+            model.objectDeleted(attribute)
+        }
+
+        override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
+            model.deleteAttribute(attribute, position)
+        }
     })
 
 
