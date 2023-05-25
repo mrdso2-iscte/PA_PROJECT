@@ -8,7 +8,7 @@ import java.awt.event.*
 import javax.swing.*
 import javax.swing.border.LineBorder
 
-class LeftView(private val model: JObject) : JPanel() {
+class LeftView(model: JObject) : JPanel() {
 
     private val observers: MutableList<LeftViewObserver> = mutableListOf()
     fun addObserver(observer: LeftViewObserver) = observers.add(observer)
@@ -26,29 +26,31 @@ class LeftView(private val model: JObject) : JPanel() {
             }
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
-                if (newAttribute.value is JArray)
-                    println("LEFT VIEW: O NOVO ATRIBUTO AGORA VAI SER UM ARRAY")
-                updateWidget(oldAttribute, newAttribute) //SOLUCAO DO PROBLEMA É AQUI, PARA ISSO TEM DE DESCOBRIR QUAL É O PANEL QUE TEM AQUELA LABEL
+                updateWidget(oldAttribute, newAttribute) 
             }
         })
         add(MenuComponent())
     }
-
-
-    private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
-        val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
-        find?.let {
-            find.modify(newAttribute)
-        }
-
-    }
-
 
     private fun addAttribute(attribute: JObjectAttribute) {
         add(AttributeComponent(attribute))
         revalidate()
         repaint()
     }
+
+    private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+        val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
+        find?.let {
+            find.modify(newAttribute)
+        }
+    }
+
+    private fun callUpdateObserver(attribute: JObjectAttribute, updatedAttribute: JObjectAttribute) {
+        observers.forEach {
+            it.attributeModified(attribute, updatedAttribute)
+        }
+    }
+
 
 
     private fun textToJValue(text: String): JValue {
@@ -65,23 +67,24 @@ class LeftView(private val model: JObject) : JPanel() {
     }
 
 
-    inner class MenuComponent() : JPanel() {
-        inner class MouseClick() : MouseAdapter() {
+    inner class MenuComponent : JPanel() {
+        inner class MouseClick : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 if (e != null) {
-                }
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    val menu = JPopupMenu("Message")
-                    val add = JButton("add")
-                    add.addActionListener {
-                        val text = JOptionPane.showInputDialog("text")
 
-                        observers.forEach {
-                            it.componentAdded(JObjectAttribute(text, JNull))
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        val menu = JPopupMenu("Message")
+                        val add = JButton("add")
+                        add.addActionListener {
+                            val text = JOptionPane.showInputDialog("text")
+
+                            observers.forEach {
+                                it.componentAdded(JObjectAttribute(text, JNull))
+                            }
                         }
+                        menu.add(add)
+                        menu.show(this@MenuComponent, 100, 100)
                     }
-                    menu.add(add)
-                    menu.show(this@MenuComponent, 100, 100)
                 }
 
             }
@@ -101,48 +104,45 @@ class LeftView(private val model: JObject) : JPanel() {
             alignmentY = Component.TOP_ALIGNMENT
             border = LineBorder(Color.ORANGE, 4, true)
 
-            //MUDEI ISTO GUIDA: AGORA HA UMA LABELPANEL PARA POR A JLABEL
             val labelPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.X_AXIS)
-                val jlabel = JLabel(attribute.label)
+                val jLabel = JLabel(attribute.label)
 
-                add(jlabel)
+                add(jLabel)
             }
-
-            //MUDEI ISTO GUIDA: AGORA HA UM TEXTFIELDPANEL PARA POR O(S) JTEXTFIELD(S)
+            var textFieldCounter = 0
             val textFieldPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(createTextField(attribute.label, attribute.value))
+                createTextField(attribute.label, attribute.value,this, textFieldCounter)
+                textFieldCounter++
             }
-
 
 
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("add")
+                        val addButton = JButton("add")
 
-                        add.addActionListener {
-                            println("LEFTVIEW: CLICASTE NUMA LABEL COM UM VALUE " + attribute.value.javaClass)
-                            if (attribute.value is JArray) { //PROBLEMA GUIDA: ELE NAO DA UPDATE DO VALUE AQUI, ELE ACHA QUE TEM ALI UM JNULL PRA SEMPRE
-                                println("LEFT VIEW: ESTAS A CARREGAR NUM ATRIBUTO QUE JA E ARRAY")
-                                if ((attribute.value as JArray).listValues.add(JNull)) {
-                                    val newAttribute = JObjectAttribute(attribute.label, attribute.value)
+                        addButton.addActionListener {
+                            if (attribute.value is JArray) {
+                                var newList = attribute.value as JArray
+                                if(newList.listValues.add(JNull)) {
+                                    val newAttribute = JObjectAttribute(attribute.label, newList)
+
+                                    callUpdateObserver(attribute, newAttribute)
                                 }
+
                             } else {
-                                println("LEFT VIEW: ESTAS A CARREGAR NUM ATRIBUTO QUE NAO E ARRAY")
                                 val newAttribute = JObjectAttribute(attribute.label, JArray(listOf(attribute.value, JNull)))
-                                observers.forEach {
-                                    //MUDEI ISTO GUIDA: AGORA O LEFTVIEW TB CHAMA O ATTRIBUTEMODIFIED PARA DAR O ATRIBUTO NOVO CUJO VALOR AGORA VAI SER UM JARRAY (QUE ESTA OVERRIDEN NO INIT)
-                                    it.attributeModified(attribute, newAttribute)
-                                }
-                                textFieldPanel.add(createTextField(attribute.label, JNull))
+                                callUpdateObserver(attribute, newAttribute)
                             }
+                            createTextField(attribute.label, JNull, textFieldPanel,textFieldCounter)
+                            textFieldCounter++
                             repaint()
                             revalidate()
                         }
-                        menu.add(add);
+                        menu.add(addButton)
                         menu.show(this@AttributeComponent, 100, 100)
                     }
                 }
@@ -151,30 +151,37 @@ class LeftView(private val model: JObject) : JPanel() {
             add(textFieldPanel)
         }
 
-        fun createTextField(label: String, value: JValue): JTextField =
-            JTextField().apply {
+
+
+        fun createTextField(label: String, value: JValue, textFieldPanel: JPanel, position: Int): JTextField {
+            val textField = JTextField()
+            textField.apply {
                 text = value.toString()
                 addKeyListener(object : KeyAdapter() {
                     override fun keyPressed(e: KeyEvent) {
-                        if (e?.keyCode == KeyEvent.VK_ENTER) {
-
-                            observers.forEach {
-                                val updatedAttribute = JObjectAttribute(label, textToJValue(text))
-                                it.attributeModified(attribute, updatedAttribute)
+                        if (e.keyCode == KeyEvent.VK_ENTER) {
+                            var updatedAttribute = JObjectAttribute(label, textToJValue(text))
+                            if (attribute.value is JArray) {
+                                val newList= (attribute.value as JArray)
+                                newList.listValues[position] = textToJValue(text)
+                                updatedAttribute= JObjectAttribute(label,newList)
                             }
+                            callUpdateObserver(attribute, updatedAttribute)
                         }
                     }
                 })
             }
 
+            textFieldPanel.add(textField)
+            return textField
+        }
+
+
         fun modify(newAttribute: JObjectAttribute) {
-            print("modify: "  + newAttribute.value)
             attribute.value = newAttribute.value
         }
 
         fun matches(l: String) = attribute.label == l
-
-
     }
 
 

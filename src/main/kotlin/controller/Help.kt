@@ -46,6 +46,7 @@ class Help {
         }
 
         override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+
             model.update(oldAttribute, newAttribute)
         }
     })

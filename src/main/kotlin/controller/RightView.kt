@@ -17,15 +17,15 @@ class RightView(private val model: JObject): JPanel(){
         srcArea.text = "$model"
         model.addObserver(object : JObjectObserver {
             override fun attributeAdded(attribute: JObjectAttribute) {
-                println("Attributes: " + model.listAttributes)
+//                println("Attributes: " + model.listAttributes)
                 srcArea.text = "$model"
             }
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
                 srcArea.text = "$model"
-                println(model.toString())
-                if(newAttribute.value.javaClass == JArray::class.java)
-                    println("RIGHT VIEW: RECEBI UM NOVO ATRIBUTO ARRAY")
+//                println(model.toString())
+//                if(newAttribute.value.javaClass == JArray::class.java)
+//                    println("RIGHT VIEW: RECEBI UM NOVO ATRIBUTO ARRAY")
             }
         })
     }
