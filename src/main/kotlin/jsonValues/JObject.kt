@@ -59,6 +59,7 @@ data class JObject(
 //        println("new attribute ${newAttribute.toString()}")
         if(listAttributes.remove(oldAttribute)){
             listAttributes.add(newAttribute)
+            println("JObject Update old $oldAttribute new $newAttribute")
             observers.forEach{
                 it.attributeUpdated(oldAttribute,newAttribute)
             }

@@ -1,12 +1,11 @@
 package controller
 
 import jsonValues.*
-import java.awt.Color
-import java.awt.Component
-import java.awt.GridLayout
+import java.awt.*
 import java.awt.event.*
 import javax.swing.*
 import javax.swing.border.LineBorder
+import kotlin.reflect.jvm.internal.impl.load.java.lazy.descriptors.DeclaredMemberIndex.Empty
 
 class LeftView(model: JObject) : JPanel() {
 
@@ -15,6 +14,7 @@ class LeftView(model: JObject) : JPanel() {
 
     init {
         layout = GridLayout(0, 1)
+        border = BorderFactory.createEmptyBorder(15,15,15,15);
         model.listAttributes.forEach {
             addAttribute(it)
 
@@ -26,7 +26,8 @@ class LeftView(model: JObject) : JPanel() {
             }
 
             override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
-                updateWidget(oldAttribute, newAttribute) 
+
+                updateWidget(oldAttribute, newAttribute)
             }
 
             override fun deleteObject(attribute: JObjectAttribute) {
@@ -41,10 +42,8 @@ class LeftView(model: JObject) : JPanel() {
             override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
                 val find = components.find { it is AttributeComponent && it.matches(attribute.label) } as? AttributeComponent
                 val find2=find?.getComponent(1) as JPanel?
-                println(find2?.size)
 
                 val find3 = find2?.components?.find { it is AttributeComponent.TextField && it.id==position } as? AttributeComponent.TextField
-                println(find3.toString())
 
 
                     find2?.remove(find3)
@@ -61,7 +60,8 @@ class LeftView(model: JObject) : JPanel() {
 
 
         })
-        add(MenuComponent())
+        addMouseListener(MouseClick())
+
     }
 
     private fun addAttribute(attribute: JObjectAttribute) {
@@ -99,7 +99,6 @@ class LeftView(model: JObject) : JPanel() {
     }
 
 
-    inner class MenuComponent : JPanel() {
         inner class MouseClick : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 if (e != null) {
@@ -122,23 +121,21 @@ class LeftView(model: JObject) : JPanel() {
                         }
                         menu.add(add)
                         menu.add(deleteAll)
-                        menu.show(this@MenuComponent, 100, 100)
+                        menu.show(this@LeftView, 100, 100)
                     }
                 }
 
             }
         }
 
-        init {
-            addMouseListener(MouseClick())
-        }
-    }
 
 
     inner class AttributeComponent(private val attribute: JObjectAttribute) : JPanel() {
 
         init {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            //layout = BoxLayout(this, BoxLayout.X_AXIS)
+            layout = GridLayout(0, 2)
+
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
             border = LineBorder(Color.ORANGE, 4, true)
@@ -172,6 +169,7 @@ class LeftView(model: JObject) : JPanel() {
                                 if(newList.listValues.add(JNull)) {
                                     val newAttribute = JObjectAttribute(attribute.label, newList)
 
+
                                     callUpdateObserver(attribute, newAttribute)
                                 }
 
@@ -202,51 +200,13 @@ class LeftView(model: JObject) : JPanel() {
         }
 
 
-/**
-        fun createTextField(label: String, value: JValue, textFieldPanel: JPanel, id: Int): JTextField {
-            val textField = JTextField()
-            textField.apply {
-                text = value.toString()
-                addKeyListener(object : KeyAdapter() {
-                    override fun keyPressed(e: KeyEvent) {
-                        if (e.keyCode == KeyEvent.VK_ENTER) {
-                            var updatedAttribute = JObjectAttribute(label, textToJValue(text))
-                            if (attribute.value is JArray) {
-                                val newList= (attribute.value as JArray)
-                                newList.listValues[id] = textToJValue(text)
-                                updatedAttribute= JObjectAttribute(label,newList)
-                            }
-                            callUpdateObserver(attribute, updatedAttribute)
-                        }
-                    }
-                })
-
-                addMouseListener(object : MouseAdapter() {
-                    override fun mouseClicked(e: MouseEvent?) {
-                        if (SwingUtilities.isRightMouseButton(e)) {
-                            val menu = JPopupMenu("Message")
-                            val deleteButton = JButton("delete")
-                            deleteButton.addActionListener {
-
-                                observers.forEach {
-                                    it.deleteAttribute(attribute,id)
-                                }
-                            }
-                            menu.add(deleteButton)
-                            menu.show(this@apply, 100, 100)
-                        }
-                    }
-                })
-            }
-
-            textFieldPanel.add(textField)
-            return textField
-        }
-        */
 
 
         fun modify(newAttribute: JObjectAttribute) {
+
             attribute.value = newAttribute.value
+
+
         }
 
         fun matches(l: String) = attribute.label == l
@@ -263,6 +223,7 @@ class LeftView(model: JObject) : JPanel() {
                             updatedAttribute= JObjectAttribute(label,newList)
                         }
                         callUpdateObserver(attribute, updatedAttribute)
+
                     }
                 }
             })
