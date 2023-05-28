@@ -149,7 +149,8 @@ class LeftView(model: JObject) : JPanel() {
             var textFieldCounter = 0
             val textFieldPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(TextField(attribute.label, attribute.value, textFieldCounter))
+                val newTextField = TextField(attribute.label, attribute.value, textFieldCounter)
+                add(newTextField)
                 //createTextField(attribute.label, attribute.value,this, textFieldCounter)
                 textFieldCounter++
             }
@@ -168,16 +169,13 @@ class LeftView(model: JObject) : JPanel() {
                                 var newList = attribute.value as JArray
                                 if(newList.listValues.add(JNull)) {
                                     val newAttribute = JObjectAttribute(attribute.label, newList)
-
-
                                     callUpdateObserver(attribute, newAttribute)
                                 }
-
                             } else {
                                 val newAttribute = JObjectAttribute(attribute.label, JArray(listOf(attribute.value, JNull)))
                                 callUpdateObserver(attribute, newAttribute)
                             }
-                            //createTextField(attribute.label, JNull, textFieldPanel,textFieldCounter)
+
                             textFieldPanel.add(TextField(attribute.label, JNull,textFieldCounter))
                             textFieldCounter++
                             repaint()
@@ -207,10 +205,12 @@ class LeftView(model: JObject) : JPanel() {
             attribute.value = newAttribute.value
 
 
+
         }
 
         fun matches(l: String) = attribute.label == l
-    inner class TextField(label: String, value: JValue, val id: Int) : JTextField() {
+    inner class TextField(label: String, value:JValue, val id: Int) : JTextField() {
+
         init {
             text = value.toString()
             addKeyListener(object : KeyAdapter() {
