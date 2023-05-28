@@ -11,6 +11,8 @@ import javax.swing.JScrollPane
 
 class Help {
 
+    /*
+
     val inscritos1 = JObject(listOf(
         JObjectAttribute("numero", JNumber(1)),
         JObjectAttribute("nome", JString("André")),
@@ -27,19 +29,23 @@ class Help {
     ))
 
 //    val model = JObject(listOf(  JObjectAttribute("inscritos", JArray(listOf(inscritos1, inscritos2)))))
-    val model = JObject(listOf( JObjectAttribute("cursos", JNull)))
+
+     */
+    val model = JObject(listOf( JObjectAttribute("cursos", JString("MEI"))))
     val undoStack = mutableListOf<Command>()
 
     private val frame=JFrame("Json Editor").apply {
-        defaultCloseOperation = javax.swing.JFrame.EXIT_ON_CLOSE
+        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         layout = GridLayout(0, 3)
         size = Dimension(600, 600)
 
+    /**MARIA: Adicionei aqui o botão de Undo*/
         val undoButton = JButton("Undo").apply {
             addActionListener {
                 if (undoStack.isNotEmpty()) {
                     val command = undoStack.removeAt(undoStack.size - 1)
                     command.undo()
+
                 }
             }
 
@@ -106,7 +112,7 @@ interface Command {
     fun run()
     fun undo()
 }
-class AddCommand(val model: JObject, val attribute: JObjectAttribute, val id : Int) : Command {
+class AddCommand(private val model: JObject, private val attribute: JObjectAttribute, private val id : Int) : Command {
     override fun run() {
         model.add(attribute)
     }
@@ -115,7 +121,7 @@ class AddCommand(val model: JObject, val attribute: JObjectAttribute, val id : I
         model.deleteAttribute(attribute, id )
     }
 }
-class UpdateCommand(val model: JObject, val oldAttribute: JObjectAttribute, val newAttribute: JObjectAttribute) : Command {
+class UpdateCommand(private val model: JObject, private val oldAttribute: JObjectAttribute, private val newAttribute: JObjectAttribute) : Command {
 
     private val oldValue = oldAttribute.value
     override fun run() {
@@ -123,12 +129,12 @@ class UpdateCommand(val model: JObject, val oldAttribute: JObjectAttribute, val 
     }
 
     override fun undo() {
-        println( " helper undo old: $oldValue, new: $newAttribute")
+        println("undo $oldValue $newAttribute")
 
         model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue))
     }
 }
-class DeleteObjectCommand(val model: JObject, val attribute: JObjectAttribute) : Command {
+class DeleteObjectCommand(private val model: JObject, private val attribute: JObjectAttribute) : Command {
     override fun run() {
         model.objectDeleted(attribute)
     }
@@ -138,7 +144,7 @@ class DeleteObjectCommand(val model: JObject, val attribute: JObjectAttribute) :
     }
 }
 
-class DeleteAllObjectsCommand(val model: JObject) : Command {
+class DeleteAllObjectsCommand(private val model: JObject) : Command {
     private val oldModel= model
     override fun run() {
         model.deleteAll()
@@ -149,7 +155,7 @@ class DeleteAllObjectsCommand(val model: JObject) : Command {
 
     }
 }
-class DeleteAttributeCommand(val model: JObject, val attribute: JObjectAttribute, val id : Int) : Command {
+class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val id : Int) : Command {
     override fun run() {
         model.deleteAttribute(attribute, id)
     }

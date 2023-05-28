@@ -5,7 +5,6 @@ import java.awt.*
 import java.awt.event.*
 import javax.swing.*
 import javax.swing.border.LineBorder
-import kotlin.reflect.jvm.internal.impl.load.java.lazy.descriptors.DeclaredMemberIndex.Empty
 
 class LeftView(model: JObject) : JPanel() {
 
@@ -14,7 +13,7 @@ class LeftView(model: JObject) : JPanel() {
 
     init {
         layout = GridLayout(0, 1)
-        border = BorderFactory.createEmptyBorder(15,15,15,15);
+        border = BorderFactory.createEmptyBorder(15,15,15,15)
         model.listAttributes.forEach {
             addAttribute(it)
 
@@ -151,7 +150,6 @@ class LeftView(model: JObject) : JPanel() {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
                 val newTextField = TextField(attribute.label, attribute.value, textFieldCounter)
                 add(newTextField)
-                //createTextField(attribute.label, attribute.value,this, textFieldCounter)
                 textFieldCounter++
             }
 
@@ -166,9 +164,13 @@ class LeftView(model: JObject) : JPanel() {
 
                         addButton.addActionListener {
                             if (attribute.value is JArray) {
-                                var newList = attribute.value as JArray
-                                if(newList.listValues.add(JNull)) {
-                                    val newAttribute = JObjectAttribute(attribute.label, newList)
+                                val originalList = attribute.value as JArray
+                                val newList = mutableListOf<JValue>()
+                                newList.addAll(originalList.listValues)
+
+                                if (newList.add(JNull))  {
+                                    val newAttribute = JObjectAttribute(attribute.label, JArray(newList))
+
                                     callUpdateObserver(attribute, newAttribute)
                                 }
                             } else {
@@ -212,16 +214,20 @@ class LeftView(model: JObject) : JPanel() {
     inner class TextField(label: String, value:JValue, val id: Int) : JTextField() {
 
         init {
+
             text = value.toString()
             addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         var updatedAttribute = JObjectAttribute(label, textToJValue(text))
                         if (attribute.value is JArray) {
-                            val newList= (attribute.value as JArray)
-                            newList.listValues[id] = textToJValue(text)
-                            updatedAttribute= JObjectAttribute(label,newList)
+                            val originalList = attribute.value as JArray
+                            val newList = mutableListOf<JValue>()
+                            newList.addAll(originalList.listValues)
+                            newList[id] = textToJValue(text)
+                            updatedAttribute= JObjectAttribute(label,JArray(newList))
                         }
+                        println("key $attribute.value $updatedAttribute ")
                         callUpdateObserver(attribute, updatedAttribute)
 
                     }
