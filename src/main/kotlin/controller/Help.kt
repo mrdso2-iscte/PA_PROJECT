@@ -156,11 +156,13 @@ class DeleteAllObjectsCommand(private val model: JObject) : Command {
     }
 }
 class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val id : Int) : Command {
+    private val oldAttribute = attribute.value
     override fun run() {
         model.deleteAttribute(attribute, id)
     }
 
     override fun undo() {
-        model.add(attribute)
+        println("esta mal $oldAttribute ")
+        model.update(attribute, JObjectAttribute(attribute.label, oldAttribute))
     }
 }
