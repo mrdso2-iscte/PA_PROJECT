@@ -5,7 +5,6 @@ import java.awt.*
 import java.awt.event.*
 import javax.swing.*
 import javax.swing.BorderFactory.createCompoundBorder
-import javax.swing.border.LineBorder
 
 class LeftView(model: JObject) : JPanel() {
 
@@ -45,11 +44,12 @@ class LeftView(model: JObject) : JPanel() {
 
             override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
                 val findComponent = components.find { it is AttributeComponent && it.matches(attribute.label) } as? AttributeComponent
+                val textField = findComponent?.textFieldsList?.get(position)
                 val findPanel=findComponent?.getComponent(1) as JPanel?
-                val findAttribute = findPanel?.components?.find { it is AttributeComponent.TextField && it.id==position } as? AttributeComponent.TextField
 
 
-                findPanel?.remove(findAttribute)
+                findPanel?.remove(textField)
+                findComponent?.textFieldsList?.remove(textField)
                 findComponent?.revalidate()
                 findComponent?.repaint()
 
@@ -135,6 +135,8 @@ class LeftView(model: JObject) : JPanel() {
 
     inner class AttributeComponent(private val attribute: JObjectAttribute) : JPanel() {
 
+        var textFieldsList = mutableListOf<TextField>()
+
         init {
             //layout = BoxLayout(this, BoxLayout.X_AXIS)
             layout = GridLayout(0, 2)
@@ -152,12 +154,13 @@ class LeftView(model: JObject) : JPanel() {
 
                 add(jLabel)
             }
-            var textFieldCounter = 0
+
+
             val textFieldPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                val newTextField = TextField( this, attribute.label, attribute.value, textFieldCounter)
+                val newTextField = TextField( this, attribute.label, attribute.value, textFieldsList)
                 add(newTextField)
-                textFieldCounter++
+                //textFieldCounter++
             }
 
 
@@ -194,8 +197,8 @@ class LeftView(model: JObject) : JPanel() {
                                 callUpdateObserver(attribute, newAttribute)
                             }
 
-                            textFieldPanel.add(TextField(textFieldPanel, attribute.label, JNull,textFieldCounter))
-                            textFieldCounter++
+                            textFieldPanel.add(TextField(textFieldPanel, attribute.label, JNull,textFieldsList))
+                            //textFieldCounter++
                             repaint()
                             revalidate()
                         }
@@ -228,7 +231,7 @@ class LeftView(model: JObject) : JPanel() {
         }
 
         fun matches(l: String) = attribute.label == l
-    inner class TextField(val panel: JPanel,label: String, value:JValue, val id: Int) : JTextField() {
+    inner class TextField(val panel: JPanel,label: String, value:JValue, val textFieldsList:MutableList<TextField>) : JTextField() {
 
 
         init {
@@ -252,7 +255,7 @@ class LeftView(model: JObject) : JPanel() {
                             val originalList = attribute.value as JArray
                             val newList = mutableListOf<JValue>()
                             newList.addAll(originalList.listValues)
-                            newList[id] = textToJValue(text)
+                            newList[textFieldsList.indexOf(this@TextField)] = textToJValue(text)
                             updatedAttribute= JObjectAttribute(label,JArray(newList))
                         }
                         callUpdateObserver(attribute, updatedAttribute)
@@ -268,7 +271,8 @@ class LeftView(model: JObject) : JPanel() {
                         deleteButton.addActionListener {
 
                             observers.forEach {
-                                it.deleteAttribute(attribute,id)
+                                it.deleteAttribute(attribute, textFieldsList.indexOf(this@TextField))
+                                //textFieldsList.remove(this@TextField)
                             }
                         }
                         menu.add(deleteButton)
@@ -276,7 +280,9 @@ class LeftView(model: JObject) : JPanel() {
                     }
                 }
             })
+            textFieldsList.add(this)
         }
+
         fun addNewView(newModel: JObject) {
             val newLeftView = LeftView(newModel)
             newLeftView.apply {

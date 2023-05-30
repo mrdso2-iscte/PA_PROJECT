@@ -39,6 +39,7 @@ class Help {
         layout = GridLayout(0, 3)
         size = Dimension(600, 600)
 
+
     /**MARIA: Adicionei aqui o botão de Undo*/
         val undoButton = JButton("Undo").apply {
             addActionListener {
@@ -48,6 +49,8 @@ class Help {
 
                 }
             }
+
+
 
         }
         add(undoButton)
