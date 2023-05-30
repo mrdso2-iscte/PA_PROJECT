@@ -132,7 +132,7 @@ class UpdateCommand(private val model: JObject, private val oldAttribute: JObjec
     }
 
     override fun undo() {
-        println("undo $oldValue $newAttribute")
+
 
         model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue))
     }
@@ -165,7 +165,6 @@ class DeleteAttributeCommand(private val model: JObject, private val attribute: 
     }
 
     override fun undo() {
-        println("esta mal $oldAttribute ")
         model.update(attribute, JObjectAttribute(attribute.label, oldAttribute))
     }
 }

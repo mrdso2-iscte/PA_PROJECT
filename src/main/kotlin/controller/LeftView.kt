@@ -188,12 +188,11 @@ class LeftView(model: JObject) : JPanel() {
 
                                 if (newList.add(JNull))  {
                                     val newAttribute = JObjectAttribute(attribute.label, JArray(newList))
-                                    println("array old $attribute new $newAttribute")
                                     callUpdateObserver(attribute, newAttribute)
                                 }
                             } else {
                                 val newAttribute = JObjectAttribute(attribute.label, JArray(listOf(attribute.value, JNull)))
-                                println("old $attribute new $newAttribute")
+
                                 callUpdateObserver(attribute, newAttribute)
                             }
 
@@ -224,10 +223,6 @@ class LeftView(model: JObject) : JPanel() {
         fun modify(newAttribute: JObjectAttribute) {
 
             attribute.value = newAttribute.value
-
-
-
-
         }
 
         fun matches(l: String) = attribute.label == l
