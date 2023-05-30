@@ -55,12 +55,12 @@ data class JObject(
     }
 
 
-    fun update(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute){
+    fun update(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int){
         if(listAttributes.remove(oldAttribute)){
             listAttributes.add(newAttribute)
             observers.forEach{
-
-                it.attributeUpdated(oldAttribute,newAttribute)
+                println("update $position")
+                it.attributeUpdated(oldAttribute,newAttribute, position )
             }
         }
     }
@@ -80,7 +80,7 @@ data class JObject(
                 it.deleteAttribute(attribute,position)
             }
             if((attribute.value as JArray).listValues.size==1){
-                update(attribute,JObjectAttribute(attribute.label,(attribute.value as JArray).listValues[0]))
+                update(attribute,JObjectAttribute(attribute.label,(attribute.value as JArray).listValues[0]), 0)
             }
 
         }
@@ -98,7 +98,7 @@ data class JObject(
 interface JObjectObserver{
     fun attributeAdded(attribute: JObjectAttribute){}
 
-    fun attributeUpdated(oldAttribute: JObjectAttribute,newAttribute: JObjectAttribute){}
+    fun attributeUpdated(oldAttribute: JObjectAttribute,newAttribute: JObjectAttribute, position: Int){}
 
     fun deleteObject(attribute: JObjectAttribute){}
     fun deleteAttribute(attribute: JObjectAttribute, position: Int){}

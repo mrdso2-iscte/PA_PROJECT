@@ -4,6 +4,7 @@ package controller
 import jsonValues.*
 import java.awt.Dimension
 import java.awt.GridLayout
+import java.text.FieldPosition
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JScrollPane
@@ -70,9 +71,9 @@ class Help {
                 command.run()
             }
 
-            override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+            override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
 
-                val command = UpdateCommand(model, oldAttribute, newAttribute)
+                val command = UpdateCommand(model, oldAttribute, newAttribute, position)
                 undoStack.add(command)
                 command.run()
 
@@ -124,17 +125,24 @@ class AddCommand(private val model: JObject, private val attribute: JObjectAttri
         model.deleteAttribute(attribute, id )
     }
 }
-class UpdateCommand(private val model: JObject, private val oldAttribute: JObjectAttribute, private val newAttribute: JObjectAttribute) : Command {
+class UpdateCommand(private val model: JObject, private val oldAttribute: JObjectAttribute, private val newAttribute: JObjectAttribute, private val position: Int ) : Command {
 
     private val oldValue = oldAttribute.value
     override fun run() {
-        model.update(oldAttribute, newAttribute)
+        model.update(oldAttribute, newAttribute, position)
     }
 
     override fun undo() {
+        if(oldValue.javaClass != newAttribute.value.javaClass){
 
+            model.deleteAttribute(newAttribute, position)
+            println("Help update sou array")
 
-        model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue))
+        }else {
+            println("Help update sou igual")
+
+            model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue), position)
+        }
     }
 }
 class DeleteObjectCommand(private val model: JObject, private val attribute: JObjectAttribute) : Command {
@@ -158,13 +166,16 @@ class DeleteAllObjectsCommand(private val model: JObject) : Command {
 
     }
 }
-class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val id : Int) : Command {
+class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val position: Int) : Command {
     private val oldAttribute = attribute.value
     override fun run() {
-        model.deleteAttribute(attribute, id)
+        model.deleteAttribute(attribute, position)
+
     }
 
     override fun undo() {
-        model.update(attribute, JObjectAttribute(attribute.label, oldAttribute))
+        println("undo do delete")
+        println("oldAttribute: $oldAttribute ")
+        model.update(attribute, JObjectAttribute(attribute.label, oldAttribute), position )
     }
 }

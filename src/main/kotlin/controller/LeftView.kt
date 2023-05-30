@@ -6,7 +6,7 @@ import java.awt.event.*
 import javax.swing.*
 import javax.swing.BorderFactory.createCompoundBorder
 
-class LeftView(model: JObject) : JPanel() {
+class LeftView(private val model: JObject) : JPanel() {
 
     private val observers: MutableList<LeftViewObserver> = mutableListOf()
     fun addObserver(observer: LeftViewObserver) = observers.add(observer)
@@ -14,9 +14,6 @@ class LeftView(model: JObject) : JPanel() {
     init {
         layout = GridLayout(0, 1)
         border = 	createCompoundBorder( BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(5,5,10,5))
-
-
-
 
         model.listAttributes.forEach {
             addAttribute(it)
@@ -28,9 +25,9 @@ class LeftView(model: JObject) : JPanel() {
                 addAttribute(attribute)
             }
 
-            override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+            override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
 
-                updateWidget(oldAttribute, newAttribute)
+                updateWidget(oldAttribute,newAttribute, position )
             }
 
             override fun deleteObject(attribute: JObjectAttribute) {
@@ -73,16 +70,27 @@ class LeftView(model: JObject) : JPanel() {
         repaint()
     }
 
-    private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+    fun findDifferentIndex(array1: JArray, array2: JArray): Int? {
+        return array1.listValues.withIndex().find { it.value != array2.listValues[it.index] }?.index
+    }
+
+
+
+    private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
         val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
+        println("qual é a position no updateWidget? $position")
+
+
+
         find?.let {
-            find.modify(newAttribute)
+
+            find.modify(newAttribute, position)
         }
     }
 
-    private fun callUpdateObserver(attribute: JObjectAttribute, updatedAttribute: JObjectAttribute) {
+    private fun callUpdateObserver(attribute: JObjectAttribute, updatedAttribute: JObjectAttribute, position: Int) {
         observers.forEach {
-            it.attributeModified(attribute, updatedAttribute)
+            it.attributeModified(attribute, updatedAttribute, position)
         }
     }
 
@@ -160,7 +168,7 @@ class LeftView(model: JObject) : JPanel() {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
                 val newTextField = TextField( this, attribute.label, attribute.value, textFieldsList)
                 add(newTextField)
-                //textFieldCounter++
+
             }
 
 
@@ -170,34 +178,23 @@ class LeftView(model: JObject) : JPanel() {
                         val menu = JPopupMenu("Message")
                         val addButton = JButton("add")
                         val deleteButton = JButton("delete")
-
-
                         addButton.addActionListener {
-
+                            val newTestField =TextField(textFieldPanel, attribute.label, JNull,textFieldsList)
+                            textFieldPanel.add(newTestField)
 
                             if (attribute.value is JArray) {
                                 val originalList = attribute.value as JArray
                                 val newList = mutableListOf<JValue>()
                                 newList.addAll(originalList.listValues)
-
-                                if(newList.all { it is JObject }){
-                                    //muda isto
-
-                                }
-
-
-                                if (newList.add(JNull))  {
+                            if (newList.add(JNull))  {
                                     val newAttribute = JObjectAttribute(attribute.label, JArray(newList))
-                                    callUpdateObserver(attribute, newAttribute)
+                                    callUpdateObserver(attribute, newAttribute, newList.size - 1)
                                 }
                             } else {
-                                val newAttribute = JObjectAttribute(attribute.label, JArray(listOf(attribute.value, JNull)))
-
-                                callUpdateObserver(attribute, newAttribute)
+                                val newList =JArray(listOf(attribute.value, JNull))
+                                val newAttribute = JObjectAttribute(attribute.label, newList)
+                                callUpdateObserver(attribute, newAttribute, newList.listValues.size - 1)
                             }
-
-                            textFieldPanel.add(TextField(textFieldPanel, attribute.label, JNull,textFieldsList))
-                            //textFieldCounter++
                             repaint()
                             revalidate()
                         }
@@ -220,9 +217,32 @@ class LeftView(model: JObject) : JPanel() {
 
 
 
-        fun modify(newAttribute: JObjectAttribute) {
+
+        fun modify(newAttribute: JObjectAttribute, position: Int) {
+
 
             attribute.value = newAttribute.value
+            if(position>=textFieldsList.size) {
+                val tp = components[1] as JPanel
+                val newTestField =TextField(tp, attribute.label, newAttribute.value, textFieldsList)
+                tp.add(newTestField)
+               // addAttribute(newAttribute)
+            }
+            else {
+                val tf = textFieldsList[position]
+
+                tf?.let {
+                    tf.text = if (newAttribute.value is JArray) {
+                        (newAttribute.value as JArray).listValues[position].toString()
+                    } else {
+                        newAttribute.value.toString()
+                    }
+                    tf.repaint()
+                    tf.revalidate()
+                }
+            }
+
+
         }
 
         fun matches(l: String) = attribute.label == l
@@ -233,7 +253,7 @@ class LeftView(model: JObject) : JPanel() {
 
             text = value.toString()
             addKeyListener(object : KeyAdapter() {
-                override fun keyPressed(e: KeyEvent) {
+                override fun keyReleased(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         var updatedAttribute = JObjectAttribute(label, textToJValue(text))
                         if(text.endsWith(":")) {
@@ -242,7 +262,8 @@ class LeftView(model: JObject) : JPanel() {
                             revalidate()
                             val newObject = JObject(listOf(JObjectAttribute(text.removeSuffix(":"), JNull)))
                             updatedAttribute = JObjectAttribute(attribute.label, JArray(listOf(newObject)))
-                            addNewView(newObject)
+
+                            addNewView(model)
 
                         }
 
@@ -253,7 +274,11 @@ class LeftView(model: JObject) : JPanel() {
                             newList[textFieldsList.indexOf(this@TextField)] = textToJValue(text)
                             updatedAttribute= JObjectAttribute(label,JArray(newList))
                         }
-                        callUpdateObserver(attribute, updatedAttribute)
+
+
+                        callUpdateObserver(attribute, updatedAttribute, textFieldsList.indexOf(this@TextField))
+
+
 
                     }
                 }
@@ -267,7 +292,6 @@ class LeftView(model: JObject) : JPanel() {
 
                             observers.forEach {
                                 it.deleteAttribute(attribute, textFieldsList.indexOf(this@TextField))
-                                //textFieldsList.remove(this@TextField)
                             }
                         }
                         menu.add(deleteButton)
@@ -276,24 +300,13 @@ class LeftView(model: JObject) : JPanel() {
                 }
             })
             textFieldsList.add(this)
+
         }
 
         fun addNewView(newModel: JObject) {
-            val newLeftView = LeftView(newModel)
-            newLeftView.apply {
+           // add(LeftView(newModel))
 
-            }
-            panel.add(newLeftView)
-            newLeftView.addObserver(object : LeftViewObserver{
-                override fun componentAdded(attribute: JObjectAttribute) {
-                    newModel.add(attribute)
-                }
 
-                override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
-                    newModel.update(oldAttribute, newAttribute)
-                }
-
-            })
         }
 
 
@@ -310,7 +323,7 @@ class LeftView(model: JObject) : JPanel() {
 
 interface LeftViewObserver {
     fun componentAdded(attribute: JObjectAttribute) {}
-    fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {}
+    fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {}
     fun deleteAttribute(attribute: JObjectAttribute, position: Int) {}
     fun deleteObject(attribute: JObjectAttribute) {}
     fun deleteAllObjects() {}

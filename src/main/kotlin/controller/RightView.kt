@@ -4,6 +4,7 @@ import jsonValues.JObject
 import jsonValues.JObjectAttribute
 import jsonValues.JObjectObserver
 import java.awt.GridLayout
+import java.text.FieldPosition
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
@@ -19,7 +20,7 @@ class RightView(private val model: JObject): JPanel(){
                 srcArea.text = "$model"
             }
 
-            override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute) {
+            override fun attributeUpdated(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
                 srcArea.text = "$model"
             }
 
