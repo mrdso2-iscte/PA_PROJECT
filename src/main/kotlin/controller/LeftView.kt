@@ -68,14 +68,20 @@ class LeftView(val model: JObject) : JPanel() {
 
     private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
         val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
-        val find1 = find?.getComponent(1) as JPanel
-        val leftView = find1?.components?.find { it is LeftView } as? LeftView
+//        val find1 = find?.getComponent(1) as JPanel
+//        val leftView = find1?.components?.find { it is LeftView && it.model} as? LeftView
+//        if(newAttribute.value !is JArray ||
+//            (newAttribute.value is JArray && newAttribute.value ) {
+//
+//                println("Vou remover a child view")
+//                find1.remove(position)
+//                find.textFieldsList.removeLast()
+//                println("size "  + find.textFieldsList.size)
+//                find1.add(find.TextField(find1, newAttribute.label, newAttribute.value, find.textFieldsList))
+//
+//        }
 
-
-        find?.let {
-                find.modify(newAttribute, position)
-
-        }
+        find?.modify(newAttribute, position)
     }
 
     private fun callUpdateObserver(attribute: JObjectAttribute, updatedAttribute: JObjectAttribute, position: Int) {
@@ -98,8 +104,6 @@ class LeftView(val model: JObject) : JPanel() {
             else -> JString(text)
         }
     }
-
-
 
 
         inner class MouseClick : MouseAdapter() {
@@ -204,33 +208,32 @@ class LeftView(val model: JObject) : JPanel() {
 
             attribute.value = newAttribute.value
             if(newAttribute.value is JArray && (newAttribute.value as JArray).listValues.size > textFieldsList.size) {
-                val tp = components[1] as JPanel
-                val newTestField =TextField(tp, attribute.label, (newAttribute.value as JArray).listValues.get(position), textFieldsList)
-                tp.add(newTestField)
+                val textPanel = components[1] as JPanel
+                val newTextField = TextField(textPanel, attribute.label, (newAttribute.value as JArray).listValues.get(position), textFieldsList)
+                textPanel.add(newTextField)
             }
             else if ((newAttribute.value is JArray && (newAttribute.value as JArray).listValues.size < textFieldsList.size) ||
                 (newAttribute.value !is JArray && position>0)) {
-                    val tp = components[1] as JPanel
-                    val tf = tp.getComponent(position)
-                    tp.remove(tf)
+                    val textPanel = components[1] as JPanel
+                    val textField = textPanel.getComponent(position)
+                    textPanel.remove(textField)
                     textFieldsList.removeAt(position)
                 }
             else {
-                val tf = textFieldsList[position]
-                tf?.let {
-                    tf.text = if (newAttribute.value is JArray) {
-                        (newAttribute.value as JArray).listValues[position].toString()
-                    } else {
-                        newAttribute.value.toString()
-                    }
-                    tf.repaint()
-                    tf.revalidate()
+                val textField = textFieldsList[position]
+                textField.text = if (newAttribute.value is JArray) {
+                    (newAttribute.value as JArray).listValues[position].toString()
+                } else {
+                    newAttribute.value.toString()
                 }
+                textField.repaint()
+                textField.revalidate()
             }
         }
 
 
         fun matches(l: String) = attribute.label == l
+
     inner class TextField(val panel: JPanel,label: String, value:JValue, val textFieldsList:MutableList<TextField>) : JTextField() {
 
         init {
@@ -245,13 +248,11 @@ class LeftView(val model: JObject) : JPanel() {
                             repaint()
                             revalidate()
                             val newObject = JObject(listOf(JObjectAttribute(newLabel, JNull)))
-                            if(attribute.value is JArray) updatedAttribute = updateArray(newObject)
-                             else updatedAttribute = JObjectAttribute(attribute.label, JArray(listOf(newObject)))
+                            updatedAttribute = if(attribute.value is JArray) updateArray(newObject)
+                            else JObjectAttribute(attribute.label, JArray(listOf(newObject)))
                             addNewView(model, newObject)
                         }
-
                         else if(attribute.value is JArray) updatedAttribute = updateArray(textToJValue(text))
-
                         callUpdateObserver(attribute, updatedAttribute, textFieldsList.indexOf(this@TextField))
                     }
                 }
@@ -276,6 +277,7 @@ class LeftView(val model: JObject) : JPanel() {
 
             textFieldsList.add(this)
         }
+
         fun updateArray(newValue: JValue): JObjectAttribute {
             val originalList = attribute.value as JArray
             val newList = mutableListOf<JValue>()
@@ -285,53 +287,12 @@ class LeftView(val model: JObject) : JPanel() {
         }
 
         fun addNewView(model: JObject, newModel: JObject) {
-            val undoStack = mutableListOf<Command>()
             val newLeftView = LeftView(newModel)
-
             panel.add(newLeftView)
-
-            newLeftView.addObserver(object : LeftViewObserver{
-                override fun componentAdded(attribute: JObjectAttribute) {
-
-                    val command = AddCommand(newModel, attribute, 0)
-                    undoStack.add(command)
-                    command.run()
-                }
-
-                override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
-                    val command = UpdateCommand(newModel, oldAttribute, newAttribute, position)
-                    undoStack.add(command)
-                    command.run()
-                    model.update()
-                }
-
-
-                override fun deleteAllObjects() {
-                    val command = DeleteAllObjectsCommand(newModel)
-                    undoStack.add(command)
-                    command.run()
-                    model.update()
-                }
-
-                override fun deleteObject(attribute: JObjectAttribute) {
-                    val command = DeleteObjectCommand(newModel, attribute )
-                    undoStack.add(command)
-                    command.run()
-                    model.update()
-                }
-
-                override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
-                    val command = DeleteAttributeCommand(newModel, attribute, position)
-                    undoStack.add(command)
-                    command.run()
-                    model.update()
-                }
-            })
+            observers.forEach { it.objectAdded(newLeftView, model) }
         }
     }
     }
-
-
 
 }
 
@@ -341,5 +302,6 @@ interface LeftViewObserver {
     fun deleteAttribute(attribute: JObjectAttribute, position: Int) {}
     fun deleteObject(attribute: JObjectAttribute) {}
     fun deleteAllObjects() {}
+    fun objectAdded(childLeftView: LeftView, parentModel: JObject) {}
 
 }

@@ -78,7 +78,6 @@ data class JObject(
         }
     }
     fun deleteAttribute(attribute: JObjectAttribute, position: Int){
-
         if(attribute.value !is JArray)  objectDeleted(attribute)
         else{
             (attribute.value as JArray).listValues.removeAt(position)
@@ -88,10 +87,9 @@ data class JObject(
             observers.forEach{
                 it.deleteAttribute(attribute,position)
             }
-
         }
-
     }
+
     fun deleteAll(){
         listAttributes.clear()
         observers.forEach{

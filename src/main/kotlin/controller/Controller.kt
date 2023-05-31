@@ -1,6 +1,7 @@
 package controller
 
 
+import command.*
 import jsonValues.*
 import java.awt.Dimension
 import java.awt.GridLayout
@@ -40,7 +41,6 @@ class Controller {
         size = Dimension(600, 600)
 
 
-    /**MARIA: Adicionei aqui o botão de Undo*/
         val undoButton = JButton("Undo").apply {
             addActionListener {
                 if (undoStack.isNotEmpty()) {
@@ -60,43 +60,47 @@ class Controller {
 
         add(scrollPane)
 
+        fun addLeftViewObservers(leftView: LeftView, parentModel: JObject?) {
+            val model = leftView.model
+            leftView.addObserver(object: LeftViewObserver{
+                override fun componentAdded(attribute: JObjectAttribute) {
+                    val command = AddCommand(parentModel, model, attribute, 0)
+                    undoStack.add(command)
+                    command.run()
+                }
 
-        leftView1.addObserver(object : LeftViewObserver{
+                override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
+                    val command = UpdateCommand(parentModel, model, oldAttribute, newAttribute, position)
+                    undoStack.add(command)
+                    command.run()
+                }
 
-            override fun componentAdded(attribute: JObjectAttribute) {
-                val command = AddCommand(model, attribute, 0)
-                undoStack.add(command)
-                command.run()
+
+                override fun deleteAllObjects() {
+                    val command = DeleteAllObjectsCommand(parentModel, model)
+                    undoStack.add(command)
+                    command.run()
+                }
+
+                override fun deleteObject(attribute: JObjectAttribute) {
+                    val command = DeleteObjectCommand(parentModel, model, attribute )
+                    undoStack.add(command)
+                    command.run()
+                }
+
+                override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
+                    val command = DeleteAttributeCommand(parentModel, model, attribute, position)
+                    undoStack.add(command)
+                    command.run()
+                }
+
+                override fun objectAdded(childLeftView: LeftView, parentModel: JObject) {
+                addLeftViewObservers(childLeftView, parentModel)
             }
+            })
+        }
 
-            override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
-
-                val command = UpdateCommand(model, oldAttribute, newAttribute, position)
-                undoStack.add(command)
-                command.run()
-
-            }
-
-            override fun deleteAllObjects() {
-              val command = DeleteAllObjectsCommand(model)
-                undoStack.add(command)
-                command.run()
-            }
-
-            override fun deleteObject(attribute: JObjectAttribute) {
-               val command = DeleteObjectCommand(model, attribute )
-                undoStack.add(command)
-                command.run()
-            }
-
-            override fun deleteAttribute(attribute: JObjectAttribute, position: Int) {
-                val command = DeleteAttributeCommand(model, attribute, position)
-                undoStack.add(command)
-                command.run()
-            }
-
-
-        })
+        addLeftViewObservers(leftView1, null)
 
 
         val right = RightView(model)
@@ -112,85 +116,3 @@ fun main(){
     Controller().open()
 }
 
-interface Command {
-    fun run()
-    fun undo()
-}
-class AddCommand(private val model: JObject, private val attribute: JObjectAttribute, private val id : Int) : Command {
-    override fun run() {
-        model.add(attribute)
-    }
-
-    override fun undo() {
-        model.deleteAttribute(attribute, id )
-    }
-}
-class UpdateCommand(private val model: JObject, private val oldAttribute: JObjectAttribute, private val newAttribute: JObjectAttribute, private val position: Int ) : Command {
-
-    private val oldValue = oldAttribute.value
-    override fun run() {
-
-        model.update(oldAttribute, newAttribute, position)
-    }
-
-    override fun undo() {
-        model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue), position)
-    }
-}
-class DeleteObjectCommand(private val model: JObject, private val attribute: JObjectAttribute) : Command {
-    override fun run() {
-        model.objectDeleted(attribute)
-    }
-
-    override fun undo() {
-        model.add(attribute)
-    }
-}
-
-class DeleteAllObjectsCommand(private val model: JObject) : Command {
-    private val oldModel= mutableListOf<JObjectAttribute>()
-    override fun run() {
-        oldModel.addAll(model.listAttributes)
-        model.deleteAll()
-    }
-
-    override fun undo() {
-        oldModel.forEach { model.add(it) }
-
-    }
-}
-class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val position: Int) : Command {
-
-
-    private var oldValue: JValue = JNull
-
-    override fun run() {
-        attribute.value.let {
-            oldValue = if(it is JArray){
-                it.listValues[position]
-            }else{
-                it
-            }
-        }
-        model.deleteAttribute(attribute, position)
-
-    }
-
-    override fun undo() {
-
-        val newValue = if(attribute.value is JArray){
-            val list = (attribute.value as JArray).listValues.toMutableList()
-            list.add(oldValue)
-            JArray(list)
-
-
-        }else{
-            JArray(listOf(attribute.value, oldValue))
-        }
-
-
-
-
-        model.update(attribute, JObjectAttribute(attribute.label,newValue), newValue.listValues.size-1 )
-    }
-}
