@@ -40,14 +40,14 @@ class ModelTests{
     }
 
     @Test
-    fun testValidateProprety(){
+    fun testValidateProperty(){
         val isCorrect = ValidateProperty("numero", JNumber::class)
         myObject.accept(isCorrect)
         assertEquals(true,isCorrect.validator)
 
         val isIncorrect = ValidateProperty("numero", JString::class)
         myObject.accept(isIncorrect)
-        assertEquals(false,isIncorrect.validator)
+        assertEquals(false, isIncorrect.validator)
     }
 
     @Test

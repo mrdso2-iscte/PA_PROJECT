@@ -1,7 +1,6 @@
 import jsonValues.*
 
     //Data Objects
-
     internal val ins1 = Inscrito(101101, "Dave Farley",true)
     internal val ins2 = Inscrito(101102,"Martin Fowler",true)
     internal val ins3 = Inscrito(26503,"André Santos", false)

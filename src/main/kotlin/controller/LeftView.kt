@@ -130,7 +130,7 @@ class LeftView(val model: JObject) : JPanel() {
             layout = GridLayout(0, 2)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
-            border = 	createCompoundBorder( BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(10,10,10,10))
+            border = createCompoundBorder( BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(10,10,10,10))
 
             val labelPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.X_AXIS)
@@ -237,11 +237,11 @@ class LeftView(val model: JObject) : JPanel() {
                             repaint()
                             revalidate()
                             val newObject = JObject(listOf(JObjectAttribute(newLabel, JNull)))
-                            updatedAttribute = if(attribute.value is JArray) updateArray(newObject)
+                            updatedAttribute = if(attribute.value is JArray) addValueToArray(newObject)
                             else JObjectAttribute(attribute.label, JArray(listOf(newObject)))
                             addNewView(model, newObject, panel)
                         }
-                        else if(attribute.value is JArray) updatedAttribute = updateArray(textToJValue(text))
+                        else if(attribute.value is JArray) updatedAttribute = addValueToArray(textToJValue(text))
                         callUpdateObserver(attribute, updatedAttribute, textFieldsList.indexOf(this@TextField))
                     }
                 }
@@ -267,7 +267,7 @@ class LeftView(val model: JObject) : JPanel() {
             textFieldsList.add(this)
         }
 
-        fun updateArray(newValue: JValue): JObjectAttribute {
+        fun addValueToArray(newValue: JValue): JObjectAttribute {
             val originalList = attribute.value as JArray
             val newList = mutableListOf<JValue>()
             newList.addAll(originalList.listValues)

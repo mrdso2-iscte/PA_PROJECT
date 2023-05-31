@@ -9,7 +9,7 @@ data class Inscrito(
     val internacional: Boolean
 
 )
-data  class UnidadeCurricular(
+data class UnidadeCurricular(
     //@ChangeName("cadeira")
     val uc: String,
     //@AsJString
