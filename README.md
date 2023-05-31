@@ -18,3 +18,7 @@ O file Help.kt permite lançar uma GUI de forma a interagir com um objeto JSON, 
 Por fim existe um botão de undo do lado esquerdo da GUI que permite retroceder todas as tarefas realizadas.
 
 
+
+https://github.com/mrdso2-iscte/PA_PROJECT/assets/99800589/0a1fb72d-0083-4d20-a7b4-530cc9727802
+
+
