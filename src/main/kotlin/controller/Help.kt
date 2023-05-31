@@ -167,15 +167,37 @@ class DeleteAllObjectsCommand(private val model: JObject) : Command {
     }
 }
 class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val position: Int) : Command {
-    private val oldAttribute = attribute.value
+
+
+    private var oldValue: JValue = JNull
+
     override fun run() {
+        attribute.value.let {
+            oldValue = if(it is JArray){
+                it.listValues[position]
+            }else{
+                it
+            }
+        }
         model.deleteAttribute(attribute, position)
 
     }
 
     override fun undo() {
-        println("undo do delete")
-        println("oldAttribute: $oldAttribute ")
-        model.update(attribute, JObjectAttribute(attribute.label, oldAttribute), position )
+
+        val newValue = if(attribute.value is JArray){
+            val list = (attribute.value as JArray).listValues.toMutableList()
+            list.add(oldValue)
+            JArray(list)
+
+
+        }else{
+            JArray(listOf(attribute.value, oldValue))
+        }
+
+
+
+
+        model.update(attribute, JObjectAttribute(attribute.label,newValue), newValue.listValues.size-1 )
     }
 }

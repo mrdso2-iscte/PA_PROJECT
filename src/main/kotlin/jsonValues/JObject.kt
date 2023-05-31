@@ -59,7 +59,6 @@ data class JObject(
         if(listAttributes.remove(oldAttribute)){
             listAttributes.add(newAttribute)
             observers.forEach{
-                println("update $position")
                 it.attributeUpdated(oldAttribute,newAttribute, position )
             }
         }
@@ -76,11 +75,11 @@ data class JObject(
         if(attribute.value !is JArray)  objectDeleted(attribute)
         else{
             (attribute.value as JArray).listValues.removeAt(position)
-            observers.forEach{
-                it.deleteAttribute(attribute,position)
-            }
             if((attribute.value as JArray).listValues.size==1){
                 update(attribute,JObjectAttribute(attribute.label,(attribute.value as JArray).listValues[0]), 0)
+            }
+            observers.forEach{
+                it.deleteAttribute(attribute,position)
             }
 
         }

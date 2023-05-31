@@ -50,6 +50,7 @@ class LeftView(private val model: JObject) : JPanel() {
                 findComponent?.revalidate()
                 findComponent?.repaint()
 
+
             }
 
             override fun allObjectsDeleted() {
@@ -78,11 +79,11 @@ class LeftView(private val model: JObject) : JPanel() {
 
     private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
         val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
-        println("qual é a position no updateWidget? $position")
 
-
+        println("update old attribute: $oldAttribute updated attribute: $newAttribute position: $position")
 
         find?.let {
+
 
             find.modify(newAttribute, position)
         }
@@ -222,13 +223,19 @@ class LeftView(private val model: JObject) : JPanel() {
 
 
             attribute.value = newAttribute.value
-            if(position>=textFieldsList.size) {
+            if(newAttribute.value is JArray){
+            if(textFieldsList.size < (newAttribute.value as JArray).listValues.size) {
                 val tp = components[1] as JPanel
-                val newTestField =TextField(tp, attribute.label, newAttribute.value, textFieldsList)
+                val newTestField =TextField(tp, attribute.label, (newAttribute.value as JArray).listValues.get(position), textFieldsList)
                 tp.add(newTestField)
-               // addAttribute(newAttribute)
-            }
+
+
+
+
+            }}
             else {
+
+
                 val tf = textFieldsList[position]
 
                 tf?.let {
@@ -283,22 +290,30 @@ class LeftView(private val model: JObject) : JPanel() {
                     }
                 }
             })
-            addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent?) {
-                    if (SwingUtilities.isRightMouseButton(e)) {
-                        val menu = JPopupMenu("Message")
-                        val deleteButton = JButton("delete")
-                        deleteButton.addActionListener {
 
-                            observers.forEach {
-                                it.deleteAttribute(attribute, textFieldsList.indexOf(this@TextField))
+                addMouseListener(object : MouseAdapter() {
+                    override fun mouseClicked(e: MouseEvent?) {
+                        if (SwingUtilities.isRightMouseButton(e)) {
+                            val menu = JPopupMenu("Message")
+                            val deleteButton = JButton("delete")
+
+                            deleteButton.addActionListener {
+
+
+                                observers.forEach {
+                                    if( attribute.value is JArray) {
+                                        it.deleteAttribute(attribute, textFieldsList.indexOf(this@TextField))
+                                    }else{
+                                        it.deleteObject(attribute)
+                                    }
+                                }
                             }
+                            menu.add(deleteButton)
+                            menu.show(this@TextField, 100, 100)
                         }
-                        menu.add(deleteButton)
-                        menu.show(this@TextField, 100, 100)
                     }
-                }
-            })
+                })
+
             textFieldsList.add(this)
 
         }
