@@ -133,16 +133,7 @@ class UpdateCommand(private val model: JObject, private val oldAttribute: JObjec
     }
 
     override fun undo() {
-        if(oldValue.javaClass != newAttribute.value.javaClass){
-
-            model.deleteAttribute(newAttribute, position)
-            println("Help update sou array")
-
-        }else {
-            println("Help update sou igual")
-
-            model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue), position)
-        }
+        model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue), position)
     }
 }
 class DeleteObjectCommand(private val model: JObject, private val attribute: JObjectAttribute) : Command {
