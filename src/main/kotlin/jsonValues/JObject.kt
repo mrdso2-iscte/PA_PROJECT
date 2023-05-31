@@ -63,6 +63,13 @@ data class JObject(
             }
         }
     }
+
+    fun update() {
+        observers.forEach{
+            it.attributeUpdated()
+        }
+    }
+
     fun objectDeleted(attribute: JObjectAttribute){
         if(listAttributes.remove(attribute)){
             observers.forEach{
@@ -99,6 +106,7 @@ interface JObjectObserver{
 
     fun attributeUpdated(oldAttribute: JObjectAttribute,newAttribute: JObjectAttribute, position: Int){}
 
+    fun attributeUpdated() {}
     fun deleteObject(attribute: JObjectAttribute){}
     fun deleteAttribute(attribute: JObjectAttribute, position: Int){}
     fun allObjectsDeleted(){}

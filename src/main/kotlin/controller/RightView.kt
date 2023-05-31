@@ -24,6 +24,10 @@ class RightView(private val model: JObject): JPanel(){
                 srcArea.text = "$model"
             }
 
+            override fun attributeUpdated(){
+                srcArea.text = "$model"
+            }
+
             override fun deleteObject(attribute: JObjectAttribute) {
                 srcArea.text = "$model"
             }
