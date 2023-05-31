@@ -4,13 +4,12 @@ package controller
 import jsonValues.*
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.text.FieldPosition
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JScrollPane
 
 
-class Help {
+class Controller {
 
     /*
 
@@ -32,7 +31,7 @@ class Help {
 //    val model = JObject(listOf(  JObjectAttribute("inscritos", JArray(listOf(inscritos1, inscritos2)))))
 
      */
-    val model = JObject(listOf( JObjectAttribute("cursos", JArray(listOf(JString("MEI"), JString("Lei"))))))
+    val model = JObject(listOf( JObjectAttribute("cursos", JArray(listOf(JString("MEI"),JString("LEI"))))))
     val undoStack = mutableListOf<Command>()
 
     private val frame=JFrame("Json Editor").apply {
@@ -41,6 +40,7 @@ class Help {
         size = Dimension(600, 600)
 
 
+    /**MARIA: Adicionei aqui o botão de Undo*/
         val undoButton = JButton("Undo").apply {
             addActionListener {
                 if (undoStack.isNotEmpty()) {
@@ -71,11 +71,12 @@ class Help {
             }
 
             override fun attributeModified(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
+
                 val command = UpdateCommand(model, oldAttribute, newAttribute, position)
                 undoStack.add(command)
                 command.run()
-            }
 
+            }
 
             override fun deleteAllObjects() {
               val command = DeleteAllObjectsCommand(model)
@@ -107,7 +108,7 @@ class Help {
 }
 
 fun main(){
-    Help().open()
+    Controller().open()
 }
 
 interface Command {
@@ -127,15 +128,12 @@ class UpdateCommand(private val model: JObject, private val oldAttribute: JObjec
 
     private val oldValue = oldAttribute.value
     override fun run() {
+
         model.update(oldAttribute, newAttribute, position)
     }
 
     override fun undo() {
-        if(oldValue.javaClass != newAttribute.value.javaClass){
-            model.deleteAttribute(newAttribute, position)
-        }else {
-            model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue), position)
-        }
+        model.update(newAttribute, JObjectAttribute(oldAttribute.label, oldValue), position)
     }
 }
 class DeleteObjectCommand(private val model: JObject, private val attribute: JObjectAttribute) : Command {
@@ -151,7 +149,7 @@ class DeleteObjectCommand(private val model: JObject, private val attribute: JOb
 class DeleteAllObjectsCommand(private val model: JObject) : Command {
     private val oldModel= mutableListOf<JObjectAttribute>()
     override fun run() {
-        model.listAttributes.forEach{ oldModel.add(it) }
+        oldModel.addAll(model.listAttributes)
         model.deleteAll()
     }
 
@@ -161,6 +159,7 @@ class DeleteAllObjectsCommand(private val model: JObject) : Command {
     }
 }
 class DeleteAttributeCommand(private val model: JObject, private val attribute: JObjectAttribute, private val position: Int) : Command {
+
 
     private var oldValue: JValue = JNull
 
@@ -173,16 +172,24 @@ class DeleteAttributeCommand(private val model: JObject, private val attribute: 
             }
         }
         model.deleteAttribute(attribute, position)
+
     }
 
     override fun undo() {
+
         val newValue = if(attribute.value is JArray){
             val list = (attribute.value as JArray).listValues.toMutableList()
             list.add(oldValue)
             JArray(list)
+
+
         }else{
             JArray(listOf(attribute.value, oldValue))
         }
+
+
+
+
         model.update(attribute, JObjectAttribute(attribute.label,newValue), newValue.listValues.size-1 )
     }
 }

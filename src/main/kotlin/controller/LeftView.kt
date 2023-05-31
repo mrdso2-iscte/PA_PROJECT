@@ -54,6 +54,7 @@ class LeftView(private val model: JObject) : JPanel() {
                 revalidate()
                 repaint()
             }
+
         })
         addMouseListener(MouseClick())
 
@@ -67,8 +68,13 @@ class LeftView(private val model: JObject) : JPanel() {
 
     private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
         val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
+        val find1 = find?.getComponent(1) as JPanel
+        val leftView = find1?.components?.find { it is LeftView } as? LeftView
+
+
         find?.let {
-            find.modify(newAttribute, position)
+                find.modify(newAttribute, position)
+
         }
     }
 
@@ -202,7 +208,8 @@ class LeftView(private val model: JObject) : JPanel() {
                 val newTestField =TextField(tp, attribute.label, (newAttribute.value as JArray).listValues.get(position), textFieldsList)
                 tp.add(newTestField)
             }
-            else if (newAttribute.value is JArray && (newAttribute.value as JArray).listValues.size < textFieldsList.size) {
+            else if ((newAttribute.value is JArray && (newAttribute.value as JArray).listValues.size < textFieldsList.size) ||
+                (newAttribute.value !is JArray && position>0)) {
                     val tp = components[1] as JPanel
                     val tf = tp.getComponent(position)
                     tp.remove(tf)
@@ -284,6 +291,7 @@ class LeftView(private val model: JObject) : JPanel() {
             panel.add(newLeftView)
             newLeftView.addObserver(object : LeftViewObserver{
                 override fun componentAdded(attribute: JObjectAttribute) {
+
                     val command = AddCommand(newModel, attribute, 0)
                     undoStack.add(command)
                     command.run()
