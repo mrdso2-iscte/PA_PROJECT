@@ -6,14 +6,14 @@ import java.awt.event.*
 import javax.swing.*
 import javax.swing.BorderFactory.createCompoundBorder
 
-class LeftView(private val model: JObject) : JPanel() {
+class LeftView(val model: JObject) : JPanel() {
 
     private val observers: MutableList<LeftViewObserver> = mutableListOf()
     fun addObserver(observer: LeftViewObserver) = observers.add(observer)
 
     init {
         layout = GridLayout(0, 1)
-        border = 	createCompoundBorder( BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(5,5,10,5))
+        border = createCompoundBorder( BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(5,5,10,5))
 
         model.listAttributes.forEach {
             addAttribute(it)
@@ -278,10 +278,11 @@ class LeftView(private val model: JObject) : JPanel() {
         }
 
         fun addNewView(model: JObject, newModel: JObject) {
-            val newLeftView = LeftView(newModel)
             val undoStack = mutableListOf<Command>()
+            val newLeftView = LeftView(newModel)
 
             panel.add(newLeftView)
+
             newLeftView.addObserver(object : LeftViewObserver{
                 override fun componentAdded(attribute: JObjectAttribute) {
                     val command = AddCommand(newModel, attribute, 0)
@@ -332,4 +333,5 @@ interface LeftViewObserver {
     fun deleteAttribute(attribute: JObjectAttribute, position: Int) {}
     fun deleteObject(attribute: JObjectAttribute) {}
     fun deleteAllObjects() {}
+
 }

@@ -35,7 +35,7 @@ class Help {
     val model = JObject(listOf( JObjectAttribute("cursos", JArray(listOf(JString("MEI"), JString("Lei"))))))
     val undoStack = mutableListOf<Command>()
 
-    private val frame=JFrame("Json Editor").apply {
+    private val frame = JFrame("Json Editor").apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         layout = GridLayout(0, 3)
         size = Dimension(600, 600)
@@ -49,9 +49,6 @@ class Help {
 
                 }
             }
-
-
-
         }
         add(undoButton)
 
@@ -63,7 +60,9 @@ class Help {
 
         add(scrollPane)
 
+
         leftView1.addObserver(object : LeftViewObserver{
+
             override fun componentAdded(attribute: JObjectAttribute) {
                 val command = AddCommand(model, attribute, 0)
                 undoStack.add(command)
@@ -94,6 +93,8 @@ class Help {
                 undoStack.add(command)
                 command.run()
             }
+
+
         })
 
 
