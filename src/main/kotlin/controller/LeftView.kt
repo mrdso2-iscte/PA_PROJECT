@@ -80,7 +80,6 @@ class LeftView(private val model: JObject) : JPanel() {
     private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
         val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
 
-        println("update old attribute: $oldAttribute updated attribute: $newAttribute position: $position")
 
         find?.let {
 
@@ -223,8 +222,8 @@ class LeftView(private val model: JObject) : JPanel() {
 
 
             attribute.value = newAttribute.value
-            if(newAttribute.value is JArray){
-            if(textFieldsList.size < (newAttribute.value as JArray).listValues.size) {
+
+            if(newAttribute.value is JArray && textFieldsList.size < (newAttribute.value as JArray).listValues.size) {
                 val tp = components[1] as JPanel
                 val newTestField =TextField(tp, attribute.label, (newAttribute.value as JArray).listValues.get(position), textFieldsList)
                 tp.add(newTestField)
@@ -232,8 +231,9 @@ class LeftView(private val model: JObject) : JPanel() {
 
 
 
-            }}
+            }
             else {
+
 
 
                 val tf = textFieldsList[position]
