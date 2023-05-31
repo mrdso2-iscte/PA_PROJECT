@@ -12,26 +12,7 @@ import javax.swing.JScrollPane
 
 class Controller {
 
-    /*
 
-    val inscritos1 = JObject(listOf(
-        JObjectAttribute("numero", JNumber(1)),
-        JObjectAttribute("nome", JString("André")),
-        JObjectAttribute("internacional", JBoolean(false))
-    ))
-    val inscritos2 = JObject(listOf(
-        JObjectAttribute("numero", JNumber(2)),
-        JObjectAttribute("nome", JString("Miguel")),
-        JObjectAttribute("internacional", JBoolean(true))
-    ))
-
-    val cursos = JObject(listOf(
-        JObjectAttribute("cursos", JArray(listOf(JString("MEI"), JString("LCD"))))
-    ))
-
-//    val model = JObject(listOf(  JObjectAttribute("inscritos", JArray(listOf(inscritos1, inscritos2)))))
-
-     */
     val model = JObject(listOf( JObjectAttribute("cursos", JArray(listOf(JString("MEI"),JString("LEI"))))))
     val undoStack = mutableListOf<Command>()
 
@@ -52,8 +33,8 @@ class Controller {
         }
         add(undoButton)
 
-        val leftView1=LeftView(model)
-        val scrollPane = JScrollPane(leftView1).apply {
+        val leftView = LeftView(model)
+        val scrollPane = JScrollPane(leftView).apply {
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         }
@@ -95,12 +76,12 @@ class Controller {
                 }
 
                 override fun objectAdded(childLeftView: LeftView, parentModel: JObject) {
-                addLeftViewObservers(childLeftView, parentModel)
+                    addLeftViewObservers(childLeftView, parentModel)
             }
             })
         }
 
-        addLeftViewObservers(leftView1, null)
+        addLeftViewObservers(leftView, null)
 
 
         val right = RightView(model)

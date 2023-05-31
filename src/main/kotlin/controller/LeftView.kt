@@ -8,13 +8,12 @@ import javax.swing.BorderFactory.createCompoundBorder
 
 class LeftView(val model: JObject) : JPanel() {
 
-    private val observers: MutableList<LeftViewObserver> = mutableListOf()
+    val observers: MutableList<LeftViewObserver> = mutableListOf()
     fun addObserver(observer: LeftViewObserver) = observers.add(observer)
 
     init {
         layout = GridLayout(0, 1)
         border = createCompoundBorder( BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(5,5,10,5))
-
         model.listAttributes.forEach {
             addAttribute(it)
         }
@@ -68,19 +67,6 @@ class LeftView(val model: JObject) : JPanel() {
 
     private fun updateWidget(oldAttribute: JObjectAttribute, newAttribute: JObjectAttribute, position: Int) {
         val find = components.find { it is AttributeComponent && it.matches(oldAttribute.label) } as? AttributeComponent
-//        val find1 = find?.getComponent(1) as JPanel
-//        val leftView = find1?.components?.find { it is LeftView && it.model} as? LeftView
-//        if(newAttribute.value !is JArray ||
-//            (newAttribute.value is JArray && newAttribute.value ) {
-//
-//                println("Vou remover a child view")
-//                find1.remove(position)
-//                find.textFieldsList.removeLast()
-//                println("size "  + find.textFieldsList.size)
-//                find1.add(find.TextField(find1, newAttribute.label, newAttribute.value, find.textFieldsList))
-//
-//        }
-
         find?.modify(newAttribute, position)
     }
 
@@ -153,17 +139,20 @@ class LeftView(val model: JObject) : JPanel() {
             }
 
 
-            val textFieldPanel = JPanel().apply {//ALTERAR AQUI PARA LER BEM OBJETOS
+            val textFieldPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                if(attribute.value is JArray) {
+                if(attribute.value is JArray && (attribute.value as JArray).listValues.all{it is JObject}) {
+                    (attribute.value as JArray).listValues.forEach {
+                        addNewView(model, it as JObject, this@apply) }
+                }
+                else if (attribute.value is JArray) {
                     (attribute.value as JArray).listValues.forEach {
                         add(TextField( this, attribute.label, it, textFieldsList)) }
-                } else {
+                }
+                else {
                     add(TextField(this, attribute.label, attribute.value, textFieldsList))
                 }
-
             }
-
 
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
@@ -173,7 +162,7 @@ class LeftView(val model: JObject) : JPanel() {
                         val deleteButton = JButton("delete")
 
                         addButton.addActionListener {
-                             if (attribute.value is JArray) { //isto nao da pra por tb numa especie de updateArray?
+                             if (attribute.value is JArray) {
                                 val originalList = attribute.value as JArray
                                 val newList = mutableListOf<JValue>()
                                 newList.addAll(originalList.listValues)
@@ -250,7 +239,7 @@ class LeftView(val model: JObject) : JPanel() {
                             val newObject = JObject(listOf(JObjectAttribute(newLabel, JNull)))
                             updatedAttribute = if(attribute.value is JArray) updateArray(newObject)
                             else JObjectAttribute(attribute.label, JArray(listOf(newObject)))
-                            addNewView(model, newObject)
+                            addNewView(model, newObject, panel)
                         }
                         else if(attribute.value is JArray) updatedAttribute = updateArray(textToJValue(text))
                         callUpdateObserver(attribute, updatedAttribute, textFieldsList.indexOf(this@TextField))
@@ -286,12 +275,14 @@ class LeftView(val model: JObject) : JPanel() {
             return JObjectAttribute(attribute.label,JArray(newList))
         }
 
-        fun addNewView(model: JObject, newModel: JObject) {
+
+    }
+        fun addNewView(model: JObject, newModel: JObject, panel: JPanel) {
             val newLeftView = LeftView(newModel)
             panel.add(newLeftView)
-            observers.forEach { it.objectAdded(newLeftView, model) }
+            observers.forEach {
+                it.objectAdded(newLeftView, model) }
         }
-    }
     }
 
 }
